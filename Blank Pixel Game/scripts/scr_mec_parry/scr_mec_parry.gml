@@ -85,20 +85,23 @@ function mec_parry_intentar()
 
 function mec_parry_reflejar(_p)
 {
-    var _objetivo = mec_enemigo_delante(jugador, mirando);
-
+    // Conserva la velocidad original y aplica el multiplicador
     var _vel = point_distance(0, 0, _p.vx, _p.vy) * parry_mult_velocidad;
+
+    // Dirección hacia donde mira el jugador
     var _dir = (mirando == 1) ? 0 : 180;
 
-    if (_objetivo != noone)
-    {
-        _dir = point_direction(_p.x, _p.y, _objetivo.x, _objetivo.y - _objetivo.sprite_height / 2);
-    }
-
+    // Cambiar la trayectoria del proyectil
     _p.vx = lengthdir_x(_vel, _dir);
     _p.vy = lengthdir_y(_vel, _dir);
+
+    // Cambiar propietario y equipo
     _p.owner = jugador;
     _p.equipo = "jugador";
+
+    // Aumentar daño
     _p.damage *= parry_mult_danio;
+
+    // Marcar como reflejado
     _p.reflejado = true;
 }
