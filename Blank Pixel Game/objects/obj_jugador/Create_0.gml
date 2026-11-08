@@ -10,7 +10,7 @@ hsp = 0;
 vsp = 0;
 
 gravedad = 0.5;
-fuerza_salto = -10;
+fuerza_salto = -12;
 
 // ==============================
 // COYOTE TIME
