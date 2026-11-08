@@ -2,9 +2,7 @@
 // MOVIMIENTO
 // ==============================
 
-velocidad_normal = 3;
-velocidad_correr = 5;
-velocidad_actual = velocidad_normal;
+velocidad_normal = 6;
 
 hsp = 0;
 vsp = 0;
@@ -36,7 +34,6 @@ salto_doble = 12;
 // ESTADOS
 // ==============================
 
-corriendo = false;
 agachado = false;
 en_suelo = false;
 

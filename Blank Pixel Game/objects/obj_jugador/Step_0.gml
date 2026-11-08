@@ -51,18 +51,12 @@ if (instance_exists(hurtbox))
 var derecha = keyboard_check(ord("D"));
 var izquierda = keyboard_check(ord("A"));
 
-// Correr
-corriendo = keyboard_check(vk_shift);
-
 // Saltar
 var salto = keyboard_check_pressed(vk_space);
 var salto_doble = keyboard_check(vk_space);
 
 // Agacharse
 var agachar = keyboard_check(vk_down);
-
-// Determinar velocidad
-velocidad_actual = corriendo ? velocidad_correr : velocidad_normal;
 
 // Determinar dirección
 var direccion = derecha - izquierda;
@@ -77,7 +71,7 @@ if (agachado)
 }
 else
 {
-    hsp = direccion * velocidad_actual;
+    hsp = direccion * velocidad_normal;
 }
 
 // Comprobar si está tocando el suelo

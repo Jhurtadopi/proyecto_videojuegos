@@ -16,7 +16,9 @@ var _dir = keyboard_check(ord("D")) - keyboard_check(ord("A"));
 if (_dir != 0) mirando = _dir;
 
 x_inicio = jugador.x;
+y_inicio = jugador.y;
 
 mec_doble_salto_inicio();
 mec_dash_inicio();
 mec_parry_inicio();
+mec_gancho_inicio();

@@ -38,6 +38,37 @@ function mec_mover_hasta_x(_j, _x_objetivo)
     }
 }
 
+// Mueve al jugador (_dx, _dy) por pasos sin atravesar sólidos. Cada eje se bloquea por
+// separado, así puede deslizarse por una superficie. Devuelve [choco_en_x, choco_en_y].
+function mec_mover_con_choque(_j, _dx, _dy)
+{
+    var _pasos = max(1, ceil(max(abs(_dx), abs(_dy))));
+    var _paso_x = _dx / _pasos;
+    var _paso_y = _dy / _pasos;
+    var _choque_x = false;
+    var _choque_y = false;
+
+    with (_j)
+    {
+        repeat (_pasos)
+        {
+            if (!_choque_x)
+            {
+                if (place_meeting(x + _paso_x, y, obj_solid)) _choque_x = true;
+                else x += _paso_x;
+            }
+
+            if (!_choque_y)
+            {
+                if (place_meeting(x, y + _paso_y, obj_solid)) _choque_y = true;
+                else y += _paso_y;
+            }
+        }
+    }
+
+    return [_choque_x, _choque_y];
+}
+
 // Enemigo más cercano en la dirección _dir (1 / -1) desde _j, o noone
 function mec_enemigo_delante(_j, _dir)
 {

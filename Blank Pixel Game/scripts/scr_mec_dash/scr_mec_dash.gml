@@ -30,8 +30,8 @@ function mec_dash_inicio()
     dash_cooldown = max(0, dash_cooldown - 1);
     if (_suelo) dash_aire_disponible = true;
 
-    if (dash_timer == 0 && !mec_parry_golpeando()
-        && keyboard_check_pressed(ord("K")) && dash_cooldown == 0
+    if (dash_timer == 0 && !mec_parry_golpeando() && !mec_gancho_activo()
+        && keyboard_check_pressed(vk_shift) && dash_cooldown == 0
         && (_suelo || dash_aire_disponible))
     {
         var _dir = keyboard_check(ord("D")) - keyboard_check(ord("A"));

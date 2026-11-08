@@ -1,7 +1,7 @@
 // ==============================
 // GOLPE / PARRY A PROYECTILES
-// Golpear (J) en el momento justo devuelve el proyectil al enemigo más cercano
-// que esté delante (no necesariamente el que lo disparó).
+// Golpear (click izquierdo) en el momento justo devuelve el proyectil al enemigo
+// más cercano que esté delante (no necesariamente el que lo disparó).
 // ==============================
 
 function mec_parry_crear()
@@ -41,7 +41,7 @@ function mec_parry_inicio()
 {
     parry_exito_timer = max(0, parry_exito_timer - 1);
 
-    if (parry_timer == 0 && !mec_dash_activo() && keyboard_check_pressed(ord("J")))
+    if (parry_timer == 0 && !mec_dash_activo() && !mec_gancho_activo() && mouse_check_button_pressed(mb_left))
     {
         parry_timer = parry_duracion;
     }

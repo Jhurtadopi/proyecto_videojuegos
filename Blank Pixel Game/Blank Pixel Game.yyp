@@ -34,6 +34,7 @@
     {"id":{"name":"scr_mec_comun","path":"scripts/scr_mec_comun/scr_mec_comun.yy",},},
     {"id":{"name":"scr_mec_dash","path":"scripts/scr_mec_dash/scr_mec_dash.yy",},},
     {"id":{"name":"scr_mec_doble_salto","path":"scripts/scr_mec_doble_salto/scr_mec_doble_salto.yy",},},
+    {"id":{"name":"scr_mec_gancho","path":"scripts/scr_mec_gancho/scr_mec_gancho.yy",},},
     {"id":{"name":"scr_mec_parry","path":"scripts/scr_mec_parry/scr_mec_parry.yy",},},
     {"id":{"name":"spr_enemigo","path":"sprites/spr_enemigo/spr_enemigo.yy",},},
     {"id":{"name":"spr_hitbox","path":"sprites/spr_hitbox/spr_hitbox.yy",},},

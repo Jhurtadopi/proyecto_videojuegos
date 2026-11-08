@@ -33,4 +33,16 @@ if (parry_exito_timer > 0)
     draw_set_halign(fa_left);
 }
 
+// Gancho: cuerda hacia la punta (volando) o hacia el ancla (balanceando)
+if (gancho_estado != GanchoEstado.INACTIVO)
+{
+    var _origen = mec_gancho_origen(_j);
+    var _px = (gancho_estado == GanchoEstado.LANZANDO) ? gancho_punta_x : gancho_ancla_x;
+    var _py = (gancho_estado == GanchoEstado.LANZANDO) ? gancho_punta_y : gancho_ancla_y;
+
+    draw_set_color(c_orange);
+    draw_line_width(_origen[0], _origen[1], _px, _py, 2);
+    draw_circle(gancho_ancla_x, gancho_ancla_y, 4, false);
+}
+
 draw_set_color(c_white);

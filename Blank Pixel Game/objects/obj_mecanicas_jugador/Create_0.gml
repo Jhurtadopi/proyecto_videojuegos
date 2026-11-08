@@ -9,6 +9,7 @@
 jugador = noone;
 mirando = 1;            // 1 derecha, -1 izquierda
 x_inicio = 0;           // x del jugador al empezar el frame
+y_inicio = 0;           // y del jugador al empezar el frame
 en_hitstop = false;
 
 depth = -100;           // dibujar por encima del jugador
@@ -18,3 +19,7 @@ nombres_estado = ["NORMAL", "ATTACK", "HURT", "KNOCKDOWN"];
 mec_doble_salto_crear();
 mec_dash_crear();
 mec_parry_crear();
+mec_gancho_crear();
+
+// El jugador apunta el gancho con un cursor propio en vez del puntero del sistema
+window_set_cursor(cr_none);

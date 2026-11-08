@@ -30,6 +30,9 @@ function mec_doble_salto_inicio()
 
     if (!keyboard_check_pressed(vk_space)) return;
 
+    // Colgado del gancho, Espacio no gasta saltos (el balanceo ignora vsp)
+    if (gancho_estado == GanchoEstado.BALANCEANDO) return;
+
     // Si obj_jugador va a hacer su salto normal este frame (suelo o coyote), no hacer nada
     if (_suelo || _j.coyote_timer > 1) return;
 
