@@ -30,7 +30,7 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{"name":"spr_jugador","path":"sprites/spr_jugador/spr_jugador.yy",},
   "spriteMaskId":null,
   "visible":true,
 }

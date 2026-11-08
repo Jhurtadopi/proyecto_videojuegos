@@ -133,6 +133,8 @@ if (place_meeting(x + hsp, y, obj_solid))
     hsp = 0;
 }
 
+x += hsp;
+
 if (place_meeting(x, y + vsp, obj_solid))
 {
     while (!place_meeting(x, y + sign(vsp), obj_solid))

@@ -30,7 +30,7 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{"name":"spr_hitbox","path":"sprites/spr_hitbox/spr_hitbox.yy",},
   "spriteMaskId":null,
   "visible":true,
 }

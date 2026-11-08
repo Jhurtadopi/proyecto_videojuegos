@@ -22,7 +22,7 @@ with (_target)
 }
 
 // HITSTOP
-with (obj_game_controller)
+with (obj_controladores)
 {
     aplicar_hitstop(5);
 }

@@ -58,6 +58,12 @@ estado_anterior = PlayerState.NORMAL;
 puede_moverse = true;
 puede_atacar = true;
 
+// CONTROLADOR (garantiza que global.hitstop_timer exista)
+if (!instance_exists(obj_controladores))
+{
+    instance_create_layer(0, 0, "Instances", obj_controladores);
+}
+
 // HURTBOX
 hurtbox = instance_create_layer(
     x,
@@ -67,6 +73,12 @@ hurtbox = instance_create_layer(
 );
 
 hurtbox.owner = id;
+
+cambiar_estado = function(_nuevo_estado)
+{
+    estado_anterior = estado;
+    estado = _nuevo_estado;
+};
 
 recibir_impacto = function(
     _damage,
@@ -87,6 +99,7 @@ recibir_impacto = function(
 
     if (vida <= 0)
     {
+        if (instance_exists(hurtbox)) instance_destroy(hurtbox);
         instance_destroy();
     }
-};v
+};
