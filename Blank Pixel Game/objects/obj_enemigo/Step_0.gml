@@ -8,6 +8,57 @@ if (instance_exists(obj_jugador) && obj_jugador.x != x)
     mirando = sign(obj_jugador.x - x);
 }
 
+if (lanzable)
+{
+    if (estado == EnemyState.KNOCKED_DOWN)
+    {
+        derribado_timer--;
+        if (derribado_timer <= 0) estado = EnemyState.NORMAL;
+    }
+
+    vsp = min(vsp + gravedad_enemigo, vsp_max);
+
+    if (place_meeting(x + hsp, y, obj_solid))
+    {
+        while (!place_meeting(x + sign(hsp), y, obj_solid)) x += sign(hsp);
+        hsp = 0;
+    }
+
+    x += hsp;
+
+    if (place_meeting(x, y + vsp, obj_solid))
+    {
+        while (!place_meeting(x, y + sign(vsp), obj_solid)) y += sign(vsp);
+
+        if (vsp > 0)
+        {
+            if (estampado)
+            {
+                estampado = false;
+                aplicar_danio(danio_estampado);
+                if (vida <= 0) exit;
+
+                estado = EnemyState.KNOCKED_DOWN;
+                derribado_timer = derribado_frames;
+            }
+            else if (estado == EnemyState.AIRBORNE)
+            {
+                estado = EnemyState.NORMAL;
+            }
+        }
+
+        vsp = 0;
+    }
+
+    y += vsp;
+
+    if (place_meeting(x, y + 1, obj_solid))
+    {
+        hsp *= friccion_suelo;
+        if (abs(hsp) < 0.1) hsp = 0;
+    }
+}
+
 if (instance_exists(hurtbox))
 {
     hurtbox.x = x;

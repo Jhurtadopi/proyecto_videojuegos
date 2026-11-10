@@ -8,3 +8,5 @@ disparo_intervalo = 90;     // frames entre disparos
 disparo_timer = 60;
 proyectil_velocidad = 4;
 rango = 900;
+
+lanzable = false;           // fija al suelo: recibe daño pero no se mueve

@@ -1,6 +1,7 @@
 // Parpadeo blanco al recibir daño
 if (flash_timer > 0) gpu_set_fog(true, c_white, 0, 1);
-draw_sprite_ext(sprite_index, image_index, x, y, mirando, 1, 0, c_white, 1);
+var _color = (estado == EnemyState.KNOCKED_DOWN) ? c_gray : c_white;     // gris = derribado
+draw_sprite_ext(sprite_index, image_index, x, y, mirando, 1, 0, _color, 1);
 if (flash_timer > 0) gpu_set_fog(false, c_white, 0, 0);
 
 // Barra de vida

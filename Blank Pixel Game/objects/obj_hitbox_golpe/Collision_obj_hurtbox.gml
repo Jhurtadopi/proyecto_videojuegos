@@ -22,6 +22,11 @@ with (_target)
     recibir_impacto(_damage, _kx, _ky, _stagger);
 }
 
+if (!is_undefined(jugador_vsp) && instance_exists(owner))
+{
+    owner.vsp = jugador_vsp;
+}
+
 with (obj_controladores)
 {
     aplicar_hitstop(_frames);
