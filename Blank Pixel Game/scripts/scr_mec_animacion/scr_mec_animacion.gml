@@ -146,6 +146,9 @@ function mec_animacion_fin()
 
     _j.image_xscale = mirando;
 
+    // Deslizando por la pared: de espaldas a ella (lo calcula scr_mec_pared el frame anterior)
+    if (mec_pared_deslizando()) _j.image_xscale = -pared_dir;
+
     // Inclinación hacia el ancla mientras cuelga (en el lanzamiento, a medias)
     var _incl_obj = 0;
     if (mec_gancho_activo() && giro_timer <= 0)

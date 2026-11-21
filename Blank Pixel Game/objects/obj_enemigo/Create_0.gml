@@ -11,6 +11,11 @@ aturdido_timer = 0;         // > 0: aturdido por un golpe (no ataca); lo llena e
 juggle_cuenta = 0;          // golpes hacia arriba recibidos sin tocar el suelo
 juggle_libres = 4;          // los primeros N golpes aéreos levantan con fuerza completa
 juggle_decaimiento = 0.25;  // cada golpe extra levanta un 25 % menos (al 8.º ya no levanta)
+
+// CONEXIÓN CON UNDERDOG: tras ser estampado queda una ventana en la que el estilo Underdog
+// (aún no implementado) podrá arrastrarlo bajo tierra. Leer conexion_underdog_timer > 0.
+conexion_underdog_frames = 45;
+conexion_underdog_timer = 0;
 mirando = -1;
 flash_timer = 0;
 

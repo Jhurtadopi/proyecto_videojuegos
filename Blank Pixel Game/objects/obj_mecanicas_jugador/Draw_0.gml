@@ -32,5 +32,6 @@ if (parry_exito_timer > 0)
 // Gancho: cable de energía desde la mano (alterna) hasta la punta o el ancla
 mec_animacion_dibujar_gancho();
 mec_gancho_enemigo_dibujar();
+mec_pared_dibujar();
 
 draw_set_color(c_white);

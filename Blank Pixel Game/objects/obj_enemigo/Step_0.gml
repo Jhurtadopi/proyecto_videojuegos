@@ -2,6 +2,7 @@ if (global.hitstop_timer > 0) exit;
 
 flash_timer = max(0, flash_timer - 1);
 aturdido_timer = max(0, aturdido_timer - 1);
+conexion_underdog_timer = max(0, conexion_underdog_timer - 1);
 
 // Mirar hacia el jugador
 if (instance_exists(obj_jugador) && obj_jugador.x != x)
@@ -43,6 +44,7 @@ if (lanzable)
 
                 estado = EnemyState.KNOCKED_DOWN;
                 derribado_timer = derribado_frames;
+                conexion_underdog_timer = conexion_underdog_frames;   // ventana para el Underdog
             }
             else if (estado == EnemyState.AIRBORNE)
             {

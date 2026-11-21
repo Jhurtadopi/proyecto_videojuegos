@@ -30,16 +30,21 @@ for _nombre in ["gancho", "lanzador", "aereo", "estampada"]:
 
 from PIL import Image
 
+def copiar_si_cambia(src, dst):
+    import filecmp
+    if not os.path.exists(dst) or not filecmp.cmp(src, dst, shallow=False):
+        shutil.copy(src, dst)
+
 def frame_entry(f):
     return '    {"$GMSpriteFrame":"v1","%%Name":"%s","name":"%s","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},\n' % (f, f)
 
-def key_entry(name, f, i):
+def key_entry(name, f, i, kid):
     return ('            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{\n'
             '                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"%s","path":"sprites/%s/%s.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},\n'
             '              },"Disabled":false,"id":"%s","IsCreationKey":false,"Key":%d.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},\n'
-            ) % (f, name, name, uuid.uuid4(), i)
+            ) % (f, name, name, kid, i)
 
-def yy(name, frames, layer, fps, W, H):
+def yy(name, frames, layer, fps, W, H, kids):
     return ('{\n  "$GMSprite":"v2",\n  "%%Name":"%(n)s",\n  "bboxMode":0,\n  "bbox_bottom":%(hb)d,\n  "bbox_left":0,\n  "bbox_right":%(wb)d,\n  "bbox_top":0,\n'
             '  "collisionKind":1,\n  "collisionTolerance":0,\n  "DynamicTexturePage":false,\n  "edgeFiltering":false,\n  "For3D":false,\n'
             '  "frames":[\n%(fr)s  ],\n  "gridX":0,\n  "gridY":0,\n  "height":%(h)d,\n  "HTile":false,\n'
@@ -57,7 +62,7 @@ def yy(name, frames, layer, fps, W, H):
             '  "swatchColours":null,\n  "swfPrecision":0.5,\n  "textureGroupId":{\n    "name":"Default",\n    "path":"texturegroups/Default",\n  },\n  "type":0,\n  "VTile":false,\n  "width":%(w)d,\n}'
             ) % dict(n=name, w=W, h=H, wb=W-1, hb=H-1, xo=W//2, l=layer, fps=fps, len=len(frames),
                      fr="".join(frame_entry(f) for f in frames),
-                     ks="".join(key_entry(name, f, i) for i, f in enumerate(frames)))
+                     ks="".join(key_entry(name, f, i, k) for i, (f, k) in enumerate(zip(frames, kids))))
 
 proj = open(YYP).read()
 for name, imgs, fps in SPRITES:
@@ -69,24 +74,28 @@ for name, imgs, fps in SPRITES:
         frames = re.findall(r'\{"\$GMSpriteFrame":"v1","%Name":"([0-9a-f-]+)"', t)
         layer = re.search(r'"\$GMImageLayer":"","%Name":"([0-9a-f-]+)"', t).group(1)
     layer = layer or str(uuid.uuid4())
+    # IDs de los fotogramas clave existentes: se reutilizan para no generar cambios en git
+    kids = []
+    if os.path.exists(old):
+        kids = re.findall(r'"Disabled":false,"id":"([0-9a-f-]+)"', open(old).read())
+    kids = (kids + [str(uuid.uuid4()) for _ in imgs])[:len(imgs)]
     frames = (frames + [str(uuid.uuid4()) for _ in imgs])[:len(imgs)]
     os.makedirs(d, exist_ok=True)
     for f, img in zip(frames, imgs):
         src = os.path.join(ART, img + ".png")
-        shutil.copy(src, os.path.join(d, f + ".png"))
+        copiar_si_cambia(src, os.path.join(d, f + ".png"))
         os.makedirs(os.path.join(d, "layers", f), exist_ok=True)
-        shutil.copy(src, os.path.join(d, "layers", f, layer + ".png"))
+        copiar_si_cambia(src, os.path.join(d, "layers", f, layer + ".png"))
     W, H = Image.open(os.path.join(ART, imgs[0] + ".png")).size
-    open(old, "w").write(yy(name, frames, layer, fps, W, H))
+    nuevo = yy(name, frames, layer, fps, W, H, kids)
+    if not os.path.exists(old) or open(old).read() != nuevo:   # solo escribe si algo cambió
+        open(old, "w").write(nuevo)
     if '"path":"sprites/%s/%s.yy"' % (name, name) not in proj:
         line = '    {"id":{"name":"%s","path":"sprites/%s/%s.yy",},},\n' % (name, name, name)
         anchor = '    {"id":{"name":"spr_proyectil"'
         proj = proj.replace(anchor, line + anchor, 1)
 open(YYP, "w").write(proj)
 
-# La colisión del jugador sigue siendo 32x64: usa spr_hurtbox (32x64, origen abajo-centro) como máscara
-oy = os.path.join(P, "objects/obj_jugador/obj_jugador.yy")
-t = open(oy).read()
-t = t.replace('"spriteMaskId":null,', '"spriteMaskId":{\n    "name":"spr_hurtbox",\n    "path":"sprites/spr_hurtbox/spr_hurtbox.yy",\n  },')
-open(oy, "w").write(t)
+# La máscara de colisión del jugador (32x64) NO se toca aquí: obj_jugador es de otros colaboradores.
+# Se asigna en tiempo de ejecución desde obj_mecanicas_jugador (jugador.mask_index = spr_hurtbox).
 print("listo")

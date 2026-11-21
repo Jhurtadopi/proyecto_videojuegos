@@ -1,7 +1,9 @@
 // ==============================
 // GANCHO A ENEMIGOS (propio; no modifica scr_mec_gancho)
 // Click derecho con la mira sobre un enemigo:
-//   - por defecto lo ATRAE hacia el jugador y lo aturde
+//   - click corto: lo ATRAE hacia el jugador y lo aturde
+//   - mantener: lo ARRASTRA colgando del cable hacia la mira; al soltar, lo LANZA en esa
+//     dirección (hacia abajo lo estampa contra el suelo)
 //   - con W (o si el enemigo no se puede mover, ej. torreta) el jugador VA hacia él
 // Corre antes de mec_gancho_inicio y le sube gancho_cooldown para que el gancho normal
 // no se dispare con el mismo click. Contexto: obj_mecanicas_jugador.
@@ -12,7 +14,8 @@ enum GanchoEnemigo
     INACTIVO,
     LANZANDO,       // la punta vuela hacia el enemigo
     ATRAYENDO,      // el enemigo viaja hacia el jugador
-    YENDO           // el jugador viaja hacia el enemigo
+    YENDO,          // el jugador viaja hacia el enemigo
+    ARRASTRANDO     // el enemigo cuelga del cable y sigue a la mira hasta soltar el click
 }
 
 function mec_gancho_enemigo_crear()
@@ -34,6 +37,14 @@ function mec_gancho_enemigo_crear()
     ge_stagger = 40;                // aturde al enganchar: da tiempo a seguir el combo
     ge_cooldown = 20;
     ge_objetivo_mira = noone;       // enemigo bajo la mira (para dibujar el anillo)
+
+    // ARRASTRE (mantener el click)
+    ge_radio_arrastre = 72;         // px del pecho del jugador al punto donde cuelga el enemigo
+    ge_seguir = 0.35;               // qué tan rápido sigue el enemigo a ese punto (0-1)
+    ge_vel_arrastre_max = 18;
+    ge_arrastre_max = 120;          // frames máximos arrastrando (luego se lanza solo)
+    ge_vel_lanzar = 16;             // velocidad del lanzamiento al soltar
+    ge_danio_lanzar = 4;
 }
 
 function mec_gancho_enemigo_activo()
@@ -142,7 +153,9 @@ function mec_gancho_enemigo_fin()
                 var _st = ge_stagger;
                 with (_e) recibir_impacto(_dn, 0, 0, _st);
                 if (!instance_exists(_e)) { mec_gancho_enemigo_terminar(); return; }
-                ge_estado = ge_ir ? GanchoEnemigo.YENDO : GanchoEnemigo.ATRAYENDO;
+                if (ge_ir) ge_estado = GanchoEnemigo.YENDO;
+                else if (mouse_check_button(mb_right)) ge_estado = GanchoEnemigo.ARRASTRANDO;   // sigue apretado
+                else ge_estado = GanchoEnemigo.ATRAYENDO;
                 ge_timer = 0;
             }
             else
@@ -170,6 +183,35 @@ function mec_gancho_enemigo_fin()
                 _e.hsp = lengthdir_x(ge_vel_atraer, _dir_atr);
                 _e.vsp = lengthdir_y(ge_vel_atraer, _dir_atr) - _e.gravedad_enemigo;
                 _e.estado = EnemyState.AIRBORNE;
+            }
+        break;
+
+        case GanchoEnemigo.ARRASTRANDO:
+            ge_punta_x = _c[0];
+            ge_punta_y = _c[1];
+            var _dir_m = point_direction(_o[0], _o[1], mouse_x, mouse_y);
+
+            if (!mouse_check_button(mb_right) || ge_timer > ge_arrastre_max)
+            {
+                // Lanzamiento hacia la mira (recibir_impacto marca la estampada si va hacia abajo)
+                var _lx = lengthdir_x(ge_vel_lanzar, _dir_m);
+                var _ly = lengthdir_y(ge_vel_lanzar, _dir_m);
+                var _dl = ge_danio_lanzar;
+                var _sl = ge_stagger;
+                with (_e) recibir_impacto(_dl, _lx, _ly, _sl);
+                with (obj_controladores) aplicar_hitstop(3);
+                mec_gancho_enemigo_terminar();
+            }
+            else
+            {
+                // Cuelga del cable: va hacia el punto a ge_radio_arrastre en dirección a la mira
+                var _px = _o[0] + lengthdir_x(ge_radio_arrastre, _dir_m);
+                var _py = _o[1] + lengthdir_y(ge_radio_arrastre, _dir_m);
+                var _vm = ge_vel_arrastre_max;
+                _e.hsp = clamp((_px - _c[0]) * ge_seguir, -_vm, _vm);
+                _e.vsp = clamp((_py - _c[1]) * ge_seguir, -_vm, _vm) - _e.gravedad_enemigo;
+                _e.estado = EnemyState.AIRBORNE;
+                _e.aturdido_timer = max(_e.aturdido_timer, 10);
             }
         break;
 

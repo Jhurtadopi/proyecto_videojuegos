@@ -3,6 +3,9 @@ if (keyboard_check_pressed(ord("Q")))
     global.estilo = (global.estilo == Estilo.SWORDMASTER) ? Estilo.BASE : Estilo.SWORDMASTER;
 }
 
+// El ultimate congela el mundo con hitstop, así que corre antes de la salida
+mec_swordmaster_ultimate_paso();
+
 if (global.hitstop_timer > 0) exit;
 
 golpe_nombre_timer = max(0, golpe_nombre_timer - 1);

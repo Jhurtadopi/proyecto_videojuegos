@@ -31,3 +31,6 @@ with (obj_controladores)
 {
     aplicar_hitstop(_frames);
 }
+
+// Carga el ultimate del Swordmaster con el daño hecho
+with (obj_mec_golpe) mec_swordmaster_ultimate_cargar(_damage);

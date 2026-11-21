@@ -1,3 +1,6 @@
+// Ultimate del Swordmaster: oscurecer, cortes, destello y barra de carga
+mec_swordmaster_ultimate_dibujar();
+
 // Estilo actual y último golpe, arriba a la derecha
 var _x = display_get_gui_width() - 16;
 var _swordmaster = (global.estilo == Estilo.SWORDMASTER);
