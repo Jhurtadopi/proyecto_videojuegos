@@ -50,6 +50,21 @@ aplicar_danio = function(_damage)
     }
 };
 
+// Peso, combos y estilos
+peso = 1.0;                     // 1.0 = ligero, 2.0 = mediano, 3.5+ = pesado
+resistencia_knockback = 1.0;    // Reduce desplazamiento/lanzamiento según peso
+poise_max = 20;                 // Umbral de desestabilización (stagger acumulado)
+poise_actual = 0;
+tiempo_desestabilizado = 0;
+duracion_desestabilizado = 50;
+
+combo_hits = 0;
+combo_ventana_max = 45;
+combo_ventana = 0;
+estilo_favorecido = "BASE";     // "SWORDMASTER", "BASE", "GUNNER"
+mult_estilo_danio = 1.3;
+mult_estilo_stagger = 1.4;
+
 recibir_impacto = function(_damage, _knockback_x, _knockback_y, _stagger)
 {
     aplicar_danio(_damage);
@@ -64,10 +79,21 @@ recibir_impacto = function(_damage, _knockback_x, _knockback_y, _stagger)
         var _factor = clamp(1 - max(0, juggle_cuenta - juggle_libres) * juggle_decaimiento, 0, 1);
         _knockback_y *= _factor;
     }
+	
+    // Beneficia el estilo que encaja con el enemigo
+    if (global.estilo == estilo_favorecido)
+    {
+        _mult_d = mult_estilo_danio;
+        _mult_s = mult_estilo_stagger;
+    }
 
     hsp = _knockback_x;
     vsp = _knockback_y;
     estampado = (_knockback_y >= impacto_estampar);
-
-    if (_knockback_y != 0) estado = EnemyState.AIRBORNE;
+	if (_knockback_y != 0) estado = EnemyState.AIRBORNE;
+	
+	// Contador de combo y bonus por combos largos/potentes
+	combo_hits += 1;
+    combo_ventana = combo_ventana_max;
+    var _bonus_combo_largo = 1.0 + max(0, combo_hits - 3) * 0.1;
 };

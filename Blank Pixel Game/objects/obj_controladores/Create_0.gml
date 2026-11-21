@@ -7,3 +7,8 @@ aplicar_hitstop = function(_frames)
         _frames
     );
 };
+
+cambiando_room = false;
+delay_cambio = 30;        // Pequeña pausa en frames tras matar al último enemigo (opcional)
+timer_cambio = delay_cambio;
+room_destino = noone;     // Si es noone, irá a room_next(room); si le asignas una room, irá a esa
