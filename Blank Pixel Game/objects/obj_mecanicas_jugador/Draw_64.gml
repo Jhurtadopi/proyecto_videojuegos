@@ -25,9 +25,10 @@ else
     draw_text(16, 16, "Jugador derrotado. Pulsa R para reiniciar.");
 }
 
-draw_text(16, display_get_gui_height() - 32,
+draw_text(16, display_get_gui_height() - 52,
     "A/D mover | Espacio saltar (x2, en pared) | Shift dash (en pleno gancho acelera; tras soltarlo, dash con voltereta) | Click izq. golpe/parry | Abajo agacharse\n"
-    + "Mantener click der. para el gancho (A/D impulsan el balanceo, W retrae, S vuelve al punto si estas arriba) | R reiniciar");
+    + "Mantener click der. para el gancho (A/D impulsan el balanceo, W retrae, S vuelve al punto si estas arriba)\n"
+    + "Click der. sobre un enemigo: atraerlo | W + click der. sobre un enemigo: ir hacia el | R reiniciar");
 
 // Mira del gancho: círculo que sigue al cursor (reemplaza al puntero del sistema)
 var _mx = device_mouse_x_to_gui(0);

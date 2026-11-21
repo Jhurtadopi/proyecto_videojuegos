@@ -24,8 +24,9 @@ def cuadros(prefijo):
                   key=lambda n: int(n.split("_")[-1]))
 
 # Sprites opcionales: se crean solo si ya existen sus cuadros
-if cuadros("gancho"):
-    SPRITES.append(("spr_jugador_gancho", cuadros("gancho"), 6))
+for _nombre in ["gancho", "lanzador", "aereo", "estampada"]:
+    if cuadros(_nombre):
+        SPRITES.append(("spr_jugador_" + _nombre, cuadros(_nombre), 6))
 
 from PIL import Image
 

@@ -30,8 +30,8 @@ function mec_animacion_crear()
     inclinacion = 0;                // grados que se inclina el cuerpo durante el gancho
     inclinacion_max = 60;
     inclinacion_suavizado = 0.25;
-    gancho_mano_dx_delantera = 6;   // px de la mano levantada respecto al centro (mirando a la derecha)
-    gancho_mano_dx_trasera = -4;
+    gancho_mano_dx_delantera = 2;   // px del puño levantado respecto al centro (mirando a la derecha), medido en spr_jugador_gancho
+    gancho_mano_dx_trasera = 0;
     gancho_mano_desde_arriba = 4;   // px desde el borde superior del sprite hasta la mano levantada
     gancho_vis_t = 0;               // tiempo para los pulsos de energía del cable
     gancho_flash = 0;               // destello al engancharse
@@ -45,6 +45,11 @@ function mec_animacion_crear()
     // código ajeno) depende de la altura del sprite y así no se mueve.
     dibujo_spr = -1;
     dibujo_img = 0;
+
+    // Sprites opcionales por golpe del Swordmaster (si no existen, se usa spr_jugador_ataque)
+    golpe_spr_lanzador = asset_get_index("spr" + "_jugador_lanzador");
+    golpe_spr_aereo = asset_get_index("spr" + "_jugador_aereo");
+    golpe_spr_estampada = asset_get_index("spr" + "_jugador_estampada");
 
     // ESTELA DEL DASH: siluetas del jugador en cian que se desvanecen
     estela_color = make_color_rgb(0, 230, 255);
@@ -160,21 +165,31 @@ function mec_animacion_fin()
     var _spr;
     var _vel = 1;
 
+    // Golpe en curso (lo elige obj_mec_golpe): cada movimiento puede tener su propio sprite
+    var _nombre_golpe = "";
+    with (obj_mec_golpe) if (is_struct(golpe_actual)) _nombre_golpe = golpe_actual.nombre;
+    var _spr_golpe = spr_jugador_ataque;
+    if (_nombre_golpe == "Lanzador" && golpe_spr_lanzador != -1) _spr_golpe = golpe_spr_lanzador;
+    else if (_nombre_golpe == "Corte aereo" && golpe_spr_aereo != -1) _spr_golpe = golpe_spr_aereo;
+    var _es_golpe = false;
+
     if (_picado_fase > 0)
     {
-        _spr = (_picado_fase == 1) ? spr_jugador_ataque : spr_jugador_salto;   // katana en alto / en picada
+        if (golpe_spr_estampada != -1) _spr = golpe_spr_estampada;              // cuadro 0 preparación, 1 picada
+        else _spr = (_picado_fase == 1) ? spr_jugador_ataque : spr_jugador_salto; // katana en alto / en picada
         _vel = 0;
     }
     else if (mec_parry_golpeando())
     {
-        _spr = spr_jugador_ataque;
+        _spr = _spr_golpe;
+        _es_golpe = true;
         _vel = 0;
     }
     else if (mec_dash_activo() && giro_timer <= 0)
     {
         _spr = spr_jugador_dash;
     }
-    else if (giro_timer > 0 || !_suelo || mec_gancho_activo())
+    else if (giro_timer > 0 || !_suelo || mec_gancho_activo() || mec_gancho_enemigo_activo())
     {
         _spr = spr_jugador_salto;
         _vel = 0;
@@ -198,9 +213,9 @@ function mec_animacion_fin()
     if (_picado_fase == 1) _j.image_index = 0;
     else if (_picado_fase == 2) _j.image_index = 1;
     // Ataque: los cuadros siguen el avance del golpe (dura parry_duracion frames)
-    else if (_spr == spr_jugador_ataque)
+    else if (_es_golpe)
     {
-        var _n = sprite_get_number(spr_jugador_ataque);
+        var _n = sprite_get_number(_spr);
         var _avance = (parry_duracion - parry_timer) / parry_duracion;
         _j.image_index = min(_n - 1, floor(_avance * _n));
     }
@@ -325,7 +340,7 @@ function mec_animacion_mano_gancho()
     return [_j.x + _rx * _c + _ry * _s, _j.y - _h / 2 - _rx * _s + _ry * _c];
 }
 
-// Draw de obj_mecanicas_jugador: cable de energía con garra
+// Draw de obj_mecanicas_jugador: cable del gancho normal
 function mec_animacion_dibujar_gancho()
 {
     if (gancho_estado == GanchoEstado.INACTIVO) return;
@@ -336,37 +351,42 @@ function mec_animacion_dibujar_gancho()
     var _lanzando = (gancho_estado == GanchoEstado.LANZANDO);
     var _px = _lanzando ? gancho_punta_x : gancho_ancla_x;
     var _py = _lanzando ? gancho_punta_y : gancho_ancla_y;
-    var _len = point_distance(_o[0], _o[1], _px, _py);
-    var _dir = point_direction(_o[0], _o[1], _px, _py);
+    mec_animacion_dibujar_cable(_o[0], _o[1], _px, _py, !_lanzando, gancho_flash);
+}
+
+// Cable de energía con garra (lo usan el gancho normal y el gancho a enemigos)
+function mec_animacion_dibujar_cable(_ox, _oy, _px, _py, _anclado, _flash)
+{
+    var _len = point_distance(_ox, _oy, _px, _py);
+    var _dir = point_direction(_ox, _oy, _px, _py);
 
     // Núcleo oscuro del cable
     draw_set_alpha(1);
     draw_set_color(make_color_rgb(14, 20, 34));
-    draw_line_width(_o[0], _o[1], _px, _py, 3);
+    draw_line_width(_ox, _oy, _px, _py, 3);
 
     gpu_set_blendmode(bm_add);
     draw_set_color(gancho_color);
 
     // Halo y filamento de energía
     draw_set_alpha(0.3);
-    draw_line_width(_o[0], _o[1], _px, _py, 5);
+    draw_line_width(_ox, _oy, _px, _py, 5);
     draw_set_alpha(0.9);
-    draw_line(_o[0], _o[1], _px, _py);
+    draw_line(_ox, _oy, _px, _py);
 
-    // Pulsos que viajan de la mano al ancla
+    // Pulsos que viajan de la mano a la punta
     var _sep = 26;
     var _d = (gancho_vis_t * 5) mod _sep;
     while (_d < _len)
     {
-        var _ax = _o[0] + lengthdir_x(_d, _dir);
-        var _ay = _o[1] + lengthdir_y(_d, _dir);
-        draw_set_alpha(0.9);
+        var _ax = _ox + lengthdir_x(_d, _dir);
+        var _ay = _oy + lengthdir_y(_d, _dir);
         draw_line_width(_ax, _ay, _ax + lengthdir_x(5, _dir), _ay + lengthdir_y(5, _dir), 2);
         _d += _sep;
     }
 
     // Cabeza: punta en flecha y tres garras (abiertas al volar, clavadas al engancharse)
-    var _abre = _lanzando ? 40 : 65;
+    var _abre = _anclado ? 65 : 40;
     draw_set_alpha(1);
     draw_triangle(_px + lengthdir_x(5, _dir), _py + lengthdir_y(5, _dir),
                   _px + lengthdir_x(4, _dir + 140), _py + lengthdir_y(4, _dir + 140),
@@ -378,22 +398,22 @@ function mec_animacion_dibujar_gancho()
     }
 
     // Anclado: anillo que late y destello al engancharse
-    if (!_lanzando)
+    if (_anclado)
     {
         var _r = 5 + 2 * abs(sin(gancho_vis_t * 0.15));
         draw_set_alpha(0.7);
         draw_circle(_px, _py, _r, true);
-        if (gancho_flash > 0)
+        if (_flash > 0)
         {
-            draw_set_alpha(gancho_flash / 10);
-            draw_circle(_px, _py, 6 + (10 - gancho_flash) * 2, true);
+            draw_set_alpha(_flash / 10);
+            draw_circle(_px, _py, 6 + (10 - _flash) * 2, true);
             draw_circle(_px, _py, 3, false);
         }
     }
 
     // Brillo en la mano / guantelete
     draw_set_alpha(0.7);
-    draw_circle(_o[0], _o[1], 3, false);
+    draw_circle(_ox, _oy, 3, false);
 
     gpu_set_blendmode(bm_normal);
     draw_set_alpha(1);

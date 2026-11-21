@@ -25,4 +25,5 @@ mec_doble_salto_inicio();
 mec_dash_inicio();
 mec_buffer_inicio();
 mec_parry_inicio();
+mec_gancho_enemigo_inicio();   // antes del gancho normal: si apunta a un enemigo, lo bloquea
 mec_gancho_inicio();

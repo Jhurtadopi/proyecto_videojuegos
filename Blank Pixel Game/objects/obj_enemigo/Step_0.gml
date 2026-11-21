@@ -33,6 +33,8 @@ if (lanzable)
 
         if (vsp > 0)
         {
+            juggle_cuenta = 0;      // tocó el suelo: el juggle vuelve a empezar
+
             if (estampado)
             {
                 estampado = false;
