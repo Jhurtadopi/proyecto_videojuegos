@@ -20,6 +20,7 @@ mec_doble_salto_crear();
 mec_dash_crear();
 mec_parry_crear();
 mec_gancho_crear();
+mec_animacion_crear();
 
 // El jugador apunta el gancho con un cursor propio en vez del puntero del sistema
 window_set_cursor(cr_none);

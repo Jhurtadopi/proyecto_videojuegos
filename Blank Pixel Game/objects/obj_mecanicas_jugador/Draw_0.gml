@@ -1,21 +1,16 @@
 // Indicadores visuales encima del jugador (no cambia cómo se dibuja obj_jugador)
 if (jugador == noone || !instance_exists(jugador)) exit;
 
+// Estela del dash y jugador rotado durante las volteretas (en el resto de frames se dibuja solo)
+mec_animacion_dibujar_estela();
+mec_animacion_dibujar();
+
 var _j = jugador;
 
 // Flecha: hacia dónde mira
 var _cy = _j.y - _j.sprite_height - 10;
 draw_set_color(c_white);
 draw_triangle(_j.x + mirando * 8, _cy, _j.x - mirando * 4, _cy - 5, _j.x - mirando * 4, _cy + 5, false);
-
-// Dash: tinte celeste
-if (mec_dash_activo())
-{
-    draw_set_alpha(0.5);
-    draw_set_color(c_aqua);
-    draw_rectangle(_j.bbox_left, _j.bbox_top, _j.bbox_right, _j.bbox_bottom, false);
-    draw_set_alpha(1);
-}
 
 // Golpe: zona amarilla en la ventana de parry, gris en la recuperación
 if (mec_parry_golpeando())

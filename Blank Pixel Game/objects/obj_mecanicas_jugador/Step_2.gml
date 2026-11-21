@@ -1,3 +1,6 @@
+// La animación corre siempre (también en hitstop, para congelarla)
+mec_animacion_fin();
+
 if (jugador == noone || en_hitstop || !instance_exists(jugador)) exit;
 
 mec_doble_salto_fin();

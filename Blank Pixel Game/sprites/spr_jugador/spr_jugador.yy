@@ -4,7 +4,7 @@
   "bboxMode":0,
   "bbox_bottom":63,
   "bbox_left":0,
-  "bbox_right":31,
+  "bbox_right":89,
   "bbox_top":0,
   "collisionKind":1,
   "collisionTolerance":0,
@@ -13,6 +13,9 @@
   "For3D":false,
   "frames":[
     {"$GMSpriteFrame":"v1","%Name":"4c369392-408e-4f05-a622-374337049cea","name":"4c369392-408e-4f05-a622-374337049cea","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"1f832df1-0348-4294-9ff0-f8ad418dd60a","name":"1f832df1-0348-4294-9ff0-f8ad418dd60a","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"30b5d7d1-17b4-4669-9976-397a1bc86586","name":"30b5d7d1-17b4-4669-9976-397a1bc86586","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"0ef2a22b-b18c-4323-8c77-c8e981b029c7","name":"0ef2a22b-b18c-4323-8c77-c8e981b029c7","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
   ],
   "gridX":0,
   "gridY":0,
@@ -49,7 +52,7 @@
     },
     "eventStubScript":null,
     "eventToFunction":{},
-    "length":1.0,
+    "length":4.0,
     "lockOrigin":false,
     "moments":{
       "$KeyframeStore<MomentsEventKeyframe>":"",
@@ -59,7 +62,7 @@
     },
     "name":"spr_jugador",
     "playback":1,
-    "playbackSpeed":30.0,
+    "playbackSpeed":6.0,
     "playbackSpeedType":0,
     "resourceType":"GMSequence",
     "resourceVersion":"2.0",
@@ -70,12 +73,21 @@
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
                 "0":{"$SpriteFrameKeyframe":"","Id":{"name":"4c369392-408e-4f05-a622-374337049cea","path":"sprites/spr_jugador/spr_jugador.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"53112620-a9df-4be6-8ea8-9e0cd4dc33f3","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+              },"Disabled":false,"id":"d08aa112-6121-4f42-bd97-cf1483b8ebd0","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"1f832df1-0348-4294-9ff0-f8ad418dd60a","path":"sprites/spr_jugador/spr_jugador.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"1d1096f2-87c5-4abc-8f77-57e9b8b266d7","IsCreationKey":false,"Key":1.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"30b5d7d1-17b4-4669-9976-397a1bc86586","path":"sprites/spr_jugador/spr_jugador.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"53da407c-87e6-4153-971e-5c6ec31ca25e","IsCreationKey":false,"Key":2.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"0ef2a22b-b18c-4323-8c77-c8e981b029c7","path":"sprites/spr_jugador/spr_jugador.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"cb766c7e-596e-47cd-b795-a0f813f77d71","IsCreationKey":false,"Key":3.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange":null,
     "volume":1.0,
-    "xorigin":16,
+    "xorigin":45,
     "yorigin":64,
   },
   "swatchColours":null,
@@ -86,5 +98,5 @@
   },
   "type":0,
   "VTile":false,
-  "width":32,
+  "width":90,
 }

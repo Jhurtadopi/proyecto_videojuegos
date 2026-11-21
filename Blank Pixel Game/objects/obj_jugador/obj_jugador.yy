@@ -34,6 +34,9 @@
     "name":"spr_jugador",
     "path":"sprites/spr_jugador/spr_jugador.yy",
   },
-  "spriteMaskId":null,
+  "spriteMaskId":{
+    "name":"spr_hurtbox",
+    "path":"sprites/spr_hurtbox/spr_hurtbox.yy",
+  },
   "visible":true,
 }
