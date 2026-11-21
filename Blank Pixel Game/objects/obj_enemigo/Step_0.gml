@@ -1,6 +1,7 @@
 if (global.hitstop_timer > 0) exit;
 
 flash_timer = max(0, flash_timer - 1);
+aturdido_timer = max(0, aturdido_timer - 1);
 
 // Mirar hacia el jugador
 if (instance_exists(obj_jugador) && obj_jugador.x != x)

@@ -16,6 +16,7 @@ draw_triangle(_j.x + mirando * 8, _cy, _j.x - mirando * 4, _cy - 5, _j.x - miran
 if (mec_parry_golpeando())
 {
     var _z = mec_parry_zona();
+    if (instance_exists(obj_mec_golpe) && !is_undefined(obj_mec_golpe.golpe_zona)) _z = obj_mec_golpe.golpe_zona;
     draw_set_color(mec_parry_en_ventana() ? c_yellow : c_gray);
     draw_rectangle(_z[0], _z[1], _z[2], _z[3], true);
 }
@@ -28,16 +29,7 @@ if (parry_exito_timer > 0)
     draw_set_halign(fa_left);
 }
 
-// Gancho: cuerda hacia la punta (volando) o hacia el ancla (balanceando)
-if (gancho_estado != GanchoEstado.INACTIVO)
-{
-    var _origen = mec_gancho_origen(_j);
-    var _px = (gancho_estado == GanchoEstado.LANZANDO) ? gancho_punta_x : gancho_ancla_x;
-    var _py = (gancho_estado == GanchoEstado.LANZANDO) ? gancho_punta_y : gancho_ancla_y;
-
-    draw_set_color(c_orange);
-    draw_line_width(_origen[0], _origen[1], _px, _py, 2);
-    draw_circle(gancho_ancla_x, gancho_ancla_y, 4, false);
-}
+// Gancho: cable de energía desde la mano (alterna) hasta la punta o el ancla
+mec_animacion_dibujar_gancho();
 
 draw_set_color(c_white);

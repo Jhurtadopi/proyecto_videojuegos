@@ -16,7 +16,9 @@ if (jugador != noone && instance_exists(jugador))
         + "\nGolpe: " + (mec_parry_en_ventana() ? "VENTANA PARRY" : (mec_parry_golpeando() ? "recuperacion" : "-"))
         + "\nGancho: " + (gancho_estado == GanchoEstado.BALANCEANDO ? "BALANCEANDO" :
             (gancho_estado == GanchoEstado.LANZANDO ? "lanzando" :
-            (gancho_cooldown > 0 ? "cooldown " + string(gancho_cooldown) : "listo"))));
+            (gancho_cooldown > 0 ? "cooldown " + string(gancho_cooldown) : "listo")))
+        + "\nVoltereta: " + (mec_animacion_girando() ? (giro_con_dash ? "GIRANDO (dash)" : "GIRANDO") :
+            (giro_post_gancho ? "lista: Shift para dash con vuelta" : "-")));
 }
 else
 {
@@ -24,7 +26,7 @@ else
 }
 
 draw_text(16, display_get_gui_height() - 32,
-    "A/D mover | Espacio saltar (x2, en pared) | Shift dash (en pleno gancho acelera el balanceo) | Click izq. golpe/parry | Abajo agacharse\n"
+    "A/D mover | Espacio saltar (x2, en pared) | Shift dash (en pleno gancho acelera; tras soltarlo, dash con voltereta) | Click izq. golpe/parry | Abajo agacharse\n"
     + "Mantener click der. para el gancho (A/D impulsan el balanceo, W retrae, S vuelve al punto si estas arriba) | R reiniciar");
 
 // Mira del gancho: círculo que sigue al cursor (reemplaza al puntero del sistema)

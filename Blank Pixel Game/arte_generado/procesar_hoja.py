@@ -1,14 +1,20 @@
 # Uso: python3 procesar_hoja.py originales/hoja.png [alto_personaje=63]
-#      python3 procesar_hoja.py --ataque originales/hoja_ataque.png [alto_personaje=63]
-#        (hoja de ataque: 1 fila, cuadro 1 = idle de referencia para la escala, cuadros 2..N = ataque)
+#      python3 procesar_hoja.py --fila NOMBRE originales/hoja.png [alto_personaje=63]
+#        (1 fila: cuadro 1 = idle de referencia para la escala, cuadros 2..N = NOMBRE_0, NOMBRE_1...)
+#        --ataque equivale a --fila ataque. Ej.: --fila gancho para las poses del gancho.
 # Corta una hoja de 2 filas x 6 cuadros (idle x4, salto x2 / correr x4, dash, ataque),
 # la escala a pixel art y deja los PNG en arte_generado/jugador/. Luego: python3 aplicar_sprites.py
 # Acepta hojas con fondo transparente (Higgsfield) o con fondo blanco liso.
 import os, sys, numpy as np
 from PIL import Image, ImageDraw
 AQUI = os.path.dirname(os.path.abspath(__file__))
-ATAQUE = "--ataque" in sys.argv
-args = [x for x in sys.argv[1:] if x != "--ataque"]
+args = sys.argv[1:]
+FILA = None
+if "--ataque" in args:
+    FILA = "ataque"; args.remove("--ataque")
+if "--fila" in args:
+    i = args.index("--fila"); FILA = args[i + 1]; del args[i:i + 2]
+ATAQUE = FILA is not None
 src = args[0]; TARGET_H = int(args[1]) if len(args) > 1 else 63
 OUT = os.path.join(AQUI, "jugador"); os.makedirs(OUT, exist_ok=True)
 
@@ -39,13 +45,13 @@ for (y0, y1) in segs(fg.any(axis=1), 20):
         ax = np.where(fg[by0:by0 + hh + 1, bx0:bx1 + 1])[1].mean() + bx0   # ancla: la cabeza
         frames.append(((bx0, by0, bx1, by1), ax))
 if ATAQUE:
-    if len(frames) < 2: sys.exit("La hoja de ataque necesita al menos 2 cuadros")
+    if len(frames) < 2: sys.exit("La hoja necesita al menos 2 cuadros (referencia + poses)")
     s = TARGET_H / (frames[0][0][3] - frames[0][0][1])        # escala medida con el idle de referencia
     frames = frames[1:]
-    names = ["ataque_%d" % i for i in range(len(frames))]
-    VIEJOS = os.path.join(AQUI, "respaldo", "ataque_anterior"); os.makedirs(VIEJOS, exist_ok=True)
-    for f in os.listdir(OUT):                                   # aparta los cuadros de ataque anteriores
-        if f.startswith("ataque_"): os.replace(os.path.join(OUT, f), os.path.join(VIEJOS, f))
+    names = ["%s_%d" % (FILA, i) for i in range(len(frames))]
+    VIEJOS = os.path.join(AQUI, "respaldo", FILA + "_anterior"); os.makedirs(VIEJOS, exist_ok=True)
+    for f in os.listdir(OUT):                                   # aparta los cuadros anteriores de esa fila
+        if f.startswith(FILA + "_"): os.replace(os.path.join(OUT, f), os.path.join(VIEJOS, f))
 else:
     if len(frames) != 12:
         sys.exit("Se esperaban 12 cuadros y se encontraron %d" % len(frames))

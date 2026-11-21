@@ -21,6 +21,10 @@ mec_dash_crear();
 mec_parry_crear();
 mec_gancho_crear();
 mec_animacion_crear();
+mec_buffer_crear();
+
+// Cámara con temblor (objeto propio): se crea si la room no tiene uno
+if (!instance_exists(obj_camara)) instance_create_layer(0, 0, "Instances", obj_camara);
 
 // El jugador apunta el gancho con un cursor propio en vez del puntero del sistema
 window_set_cursor(cr_none);

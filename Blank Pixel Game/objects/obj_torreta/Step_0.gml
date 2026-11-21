@@ -2,6 +2,7 @@ event_inherited();
 
 if (global.hitstop_timer > 0) exit;
 if (!instance_exists(obj_jugador)) exit;
+if (aturdido_timer > 0) exit;   // aturdida: no dispara (el contador se pausa)
 
 disparo_timer--;
 

@@ -5,6 +5,7 @@ vida_maxima = 40;
 vida = vida_maxima;
 
 estado = EnemyState.NORMAL;
+aturdido_timer = 0;         // > 0: aturdido por un golpe (no ataca); lo llena el stagger
 mirando = -1;
 flash_timer = 0;
 
@@ -42,6 +43,7 @@ aplicar_danio = function(_damage)
 recibir_impacto = function(_damage, _knockback_x, _knockback_y, _stagger)
 {
     aplicar_danio(_damage);
+    aturdido_timer = max(aturdido_timer, _stagger);
 
     if (vida <= 0 || !lanzable) return;
 

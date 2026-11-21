@@ -7,6 +7,9 @@ if (keyboard_check_pressed(ord("R")))
 
 jugador = instance_exists(obj_jugador) ? instance_find(obj_jugador, 0) : noone;
 
+// Colisión fija de 32x64 aunque los sprites del jugador sean más grandes (sin editar obj_jugador)
+if (jugador != noone) jugador.mask_index = spr_hurtbox;
+
 // obj_jugador no se mueve durante el hitstop; las mecánicas tampoco
 en_hitstop = variable_global_exists("hitstop_timer") && global.hitstop_timer > 0;
 
@@ -20,5 +23,6 @@ y_inicio = jugador.y;
 
 mec_doble_salto_inicio();
 mec_dash_inicio();
+mec_buffer_inicio();
 mec_parry_inicio();
 mec_gancho_inicio();

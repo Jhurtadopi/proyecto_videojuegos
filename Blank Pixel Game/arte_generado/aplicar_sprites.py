@@ -19,6 +19,14 @@ SPRITES = [
     ("spr_jugador_ataque", sorted([f[:-4] for f in os.listdir(ART) if f.startswith("ataque_") and f.endswith(".png")],
                                   key=lambda n: int(n.split("_")[1])), 10),
 ]
+def cuadros(prefijo):
+    return sorted([f[:-4] for f in os.listdir(ART) if f.startswith(prefijo + "_") and f.endswith(".png")],
+                  key=lambda n: int(n.split("_")[-1]))
+
+# Sprites opcionales: se crean solo si ya existen sus cuadros
+if cuadros("gancho"):
+    SPRITES.append(("spr_jugador_gancho", cuadros("gancho"), 6))
+
 from PIL import Image
 
 def frame_entry(f):

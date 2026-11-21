@@ -7,6 +7,8 @@
 golpe_base = { nombre: "Golpe", danio: 10, kx: 5, ky: -3, stagger: 10, hitstop: 5, jugador_vsp: undefined };
 
 golpe_hitbox = noone;       // hitbox activo del golpe actual
+golpe_actual = undefined;   // datos del golpe en curso
+golpe_zona = undefined;     // zona real del último golpe [x1, y1, x2, y2] (la dibuja obj_mecanicas_jugador)
 golpe_kx = 0;               // empuje horizontal del golpe actual
 golpe_nombre = "";          // nombre del último golpe, para el HUD
 golpe_nombre_timer = 0;     // frames que se sigue mostrando

@@ -46,14 +46,27 @@ if (!instance_exists(golpe_hitbox))
     golpe_hitbox.hitstop = _g.hitstop;
     golpe_hitbox.jugador_vsp = _g.jugador_vsp;
 
+    golpe_actual = _g;
     golpe_kx = _g.kx;
     golpe_nombre = _g.nombre;
     golpe_nombre_timer = 30;
 }
+
+// Cada golpe puede tener su propia zona (Swordmaster); si no, usa la del parry
+var _zona_golpe = mec_golpe_zona(_jugador, _mirando, golpe_actual);
+if (!is_undefined(_zona_golpe)) _zona = _zona_golpe;
+golpe_zona = _zona;
 
 // El hitbox sigue al jugador y cubre exactamente la zona del golpe
 golpe_hitbox.x = _zona[0];
 golpe_hitbox.y = _zona[1];
 golpe_hitbox.image_xscale = (_zona[2] - _zona[0]) / sprite_get_width(spr_golpe_hitbox);
 golpe_hitbox.image_yscale = (_zona[3] - _zona[1]) / sprite_get_height(spr_golpe_hitbox);
-golpe_hitbox.knockback_x = golpe_kx * _mirando;
+// Golpes direccionales (corte aéreo): A/D al golpear decide hacia dónde sale el enemigo
+var _kx = golpe_kx * _mirando;
+if (is_struct(golpe_actual) && variable_struct_exists(golpe_actual, "kx_input"))
+{
+    var _in = keyboard_check(ord("D")) - keyboard_check(ord("A"));
+    if (_in != 0) _kx = _in * golpe_actual.kx_input;
+}
+golpe_hitbox.knockback_x = _kx;
