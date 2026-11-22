@@ -4,6 +4,7 @@ if (jugador == noone || !instance_exists(jugador)) exit;
 // Estela del dash y jugador rotado durante las volteretas (en el resto de frames se dibuja solo)
 mec_animacion_dibujar_estela();
 mec_animacion_dibujar();
+mec_underdog_dibujar();
 
 var _j = jugador;
 

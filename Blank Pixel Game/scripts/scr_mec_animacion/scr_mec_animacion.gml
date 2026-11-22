@@ -206,6 +206,26 @@ function mec_animacion_fin()
         _spr = spr_jugador;   // idle
     }
 
+    // Estilo Underdog: sus propios sprites (taladro y gafas rojas)
+    var _ud_idx = -1;
+    if (mec_underdog_activo() && _picado_fase == 0)
+    {
+        var _vaiven = [0, 1, 2, 1];                 // ida y vuelta: el taladro barre de lado a lado
+        if (ud_accion == UdAccion.ARRIBA) { _spr = spr_jugador_ud_arriba; _vel = 0; _ud_idx = _vaiven[(ud_t div 3) mod 4]; }
+        else if (ud_accion == UdAccion.SUBIR) { _spr = spr_jugador_ud_subir; _vel = 0; _ud_idx = _vaiven[(ud_t div 3) mod 4]; }
+        else if (ud_accion == UdAccion.EMERGER) { _spr = spr_jugador_ud_emerger; _vel = 0; _ud_idx = 0; }
+        else if (_es_golpe) _spr = spr_jugador_ud_ataque;
+        else if (_spr == spr_jugador) _spr = spr_jugador_ud_idle;
+        else if (_spr == spr_jugador_correr) _spr = spr_jugador_ud_correr;
+        else if (_spr == spr_jugador_dash) { _spr = spr_jugador_ud_correr; _vel = 0; _ud_idx = 1; }
+        else if (_spr == spr_jugador_salto && !mec_gancho_activo() && giro_timer <= 0)
+        {
+            _spr = (_j.vsp < 0) ? spr_jugador_ud_emerger : spr_jugador_ud_idle;
+            _vel = 0;
+            _ud_idx = 0;
+        }
+    }
+
     if (_j.sprite_index != _spr)
     {
         _j.sprite_index = _spr;
@@ -225,6 +245,7 @@ function mec_animacion_fin()
 
     // Salto: cuadro 0 subiendo, cuadro 1 cayendo (durante la vuelta, siempre el 0: más compacto)
     if (_spr == spr_jugador_salto) _j.image_index = (giro_timer > 0 || _j.vsp < 0) ? 0 : 1;
+    if (_ud_idx >= 0) _j.image_index = _ud_idx;
 
     // Gancho: se dibuja la pose del brazo levantado (cuadro 0 mano delantera, 1 trasera)
     dibujo_spr = -1;
@@ -237,7 +258,7 @@ function mec_animacion_fin()
     _j.image_speed = _vel;
 
     // Durante la vuelta, el sprite normal se oculta y lo dibuja mec_animacion_dibujar
-    _j.visible = (giro_timer <= 0 && giro_angulo == 0 && inclinacion == 0 && dibujo_spr == -1);
+    _j.visible = (giro_timer <= 0 && giro_angulo == 0 && inclinacion == 0 && dibujo_spr == -1 && !mec_underdog_oculto());
 
     // --- Estela del dash ---
     for (var i = array_length(estela) - 1; i >= 0; i--)
@@ -276,6 +297,7 @@ function mec_animacion_dibujar()
 {
     var _j = jugador;
     if (_j == noone || !instance_exists(_j) || _j.visible) return;
+    if (mec_underdog_oculto()) return;          // bajo tierra lo dibuja mec_underdog_dibujar
 
     var _ang = giro_angulo + inclinacion;
     var _spr = (dibujo_spr != -1) ? dibujo_spr : _j.sprite_index;

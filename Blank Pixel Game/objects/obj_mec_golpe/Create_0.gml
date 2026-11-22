@@ -13,5 +13,6 @@ golpe_kx = 0;               // empuje horizontal del golpe actual
 golpe_nombre = "";          // nombre del último golpe, para el HUD
 golpe_nombre_timer = 0;     // frames que se sigue mostrando
 
-global.estilo = Estilo.SWORDMASTER;
+// Estilo inicial: la room de pruebas del Underdog empieza en ese estilo
+global.estilo = (room == Room_Underdog) ? Estilo.UNDERDOG : Estilo.SWORDMASTER;
 mec_swordmaster_crear();

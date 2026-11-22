@@ -56,10 +56,12 @@ def separar(cols, banda, n):
     return cols
 
 frames = []
+SEPARADO = False        # True si hubo que partir poses pegadas: solo entonces se limpian restos sueltos
 for (y0, y1) in segs(fg.any(axis=1), 20):
     _cols = segs(fg[y0:y1 + 1].any(axis=0), 8)
     if ESPERADOS and len(_cols) < ESPERADOS:
         _cols = separar(_cols, fg[y0:y1 + 1], ESPERADOS)
+        SEPARADO = True
     for (x0, x1) in _cols:
         ys, xs = np.where(fg[y0:y1 + 1, x0:x1 + 1])
         by0, by1, bx0, bx1 = ys.min() + y0, ys.max() + y0, xs.min() + x0, xs.max() + x0
@@ -127,7 +129,8 @@ for (bx0, by0, bx1, by1), ax in frames:
     A = r[..., 3]
     rgb = np.where(A[..., None] > 0, r[..., :3] / np.maximum(A[..., None] / 255, 1e-3), 0)
     o = np.zeros((h, w, 4), np.uint8); o[..., :3] = np.clip(rgb, 0, 255); o[..., 3] = (A >= 110) * 255
-    small.append(limpiar(o, (ax - bx0) * s))
+    # (sin separar se conservan los fragmentos sueltos: rocas, chispas, líneas de energía)
+    small.append(limpiar(o, (ax - bx0) * s) if SEPARADO else (o, (ax - bx0) * s))
 
 pix = np.concatenate([o[o[..., 3] > 0][:, :3] for o, _ in small])
 pal = Image.fromarray(pix.reshape(-1, 1, 3)).quantize(colors=24, method=Image.MEDIANCUT)

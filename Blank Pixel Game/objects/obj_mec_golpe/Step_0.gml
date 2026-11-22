@@ -1,6 +1,12 @@
 if (keyboard_check_pressed(ord("Q")))
 {
-    global.estilo = (global.estilo == Estilo.SWORDMASTER) ? Estilo.BASE : Estilo.SWORDMASTER;
+    // Swordmaster -> Underdog -> Base -> Swordmaster
+    switch (global.estilo)
+    {
+        case Estilo.SWORDMASTER: global.estilo = Estilo.UNDERDOG; break;
+        case Estilo.UNDERDOG: global.estilo = Estilo.BASE; break;
+        default: global.estilo = Estilo.SWORDMASTER; break;
+    }
 }
 
 // El ultimate congela el mundo con hitstop, así que corre antes de la salida
@@ -39,7 +45,9 @@ if (!_activo)
 
 if (!instance_exists(golpe_hitbox))
 {
-    var _g = (global.estilo == Estilo.SWORDMASTER) ? mec_swordmaster_elegir_golpe(_jugador) : golpe_base;
+    var _g = golpe_base;
+    if (global.estilo == Estilo.SWORDMASTER) _g = mec_swordmaster_elegir_golpe(_jugador);
+    else if (global.estilo == Estilo.UNDERDOG) _g = mec_underdog_elegir_golpe(_jugador);
 
     golpe_hitbox = instance_create_layer(_zona[0], _zona[1], "Instances", obj_hitbox_golpe);
     golpe_hitbox.owner = _jugador;

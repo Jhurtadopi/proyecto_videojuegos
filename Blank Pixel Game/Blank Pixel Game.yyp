@@ -15,7 +15,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2026.0.0.16",
+    "IDEVersion":"2026.1.0.27",
   },
   "name":"Blank Pixel Game",
   "resources":[
@@ -35,6 +35,7 @@
     {"id":{"name":"obj_proyectil","path":"objects/obj_proyectil/obj_proyectil.yy",},},
     {"id":{"name":"obj_solid","path":"objects/obj_solid/obj_solid.yy",},},
     {"id":{"name":"obj_torreta","path":"objects/obj_torreta/obj_torreta.yy",},},
+    {"id":{"name":"Room_Underdog","path":"rooms/Room_Underdog/Room_Underdog.yy",},},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
     {"id":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
     {"id":{"name":"scr_estado_enemigo","path":"scripts/scr_estado_enemigo/scr_estado_enemigo.yy",},},
@@ -50,6 +51,7 @@
     {"id":{"name":"scr_mec_pared","path":"scripts/scr_mec_pared/scr_mec_pared.yy",},},
     {"id":{"name":"scr_mec_parry","path":"scripts/scr_mec_parry/scr_mec_parry.yy",},},
     {"id":{"name":"scr_mec_swordmaster","path":"scripts/scr_mec_swordmaster/scr_mec_swordmaster.yy",},},
+    {"id":{"name":"scr_mec_underdog","path":"scripts/scr_mec_underdog/scr_mec_underdog.yy",},},
     {"id":{"name":"spr_enemigo","path":"sprites/spr_enemigo/spr_enemigo.yy",},},
     {"id":{"name":"spr_golpe_hitbox","path":"sprites/spr_golpe_hitbox/spr_golpe_hitbox.yy",},},
     {"id":{"name":"spr_hitbox","path":"sprites/spr_hitbox/spr_hitbox.yy",},},
@@ -62,6 +64,13 @@
     {"id":{"name":"spr_jugador_gancho","path":"sprites/spr_jugador_gancho/spr_jugador_gancho.yy",},},
     {"id":{"name":"spr_jugador_lanzador","path":"sprites/spr_jugador_lanzador/spr_jugador_lanzador.yy",},},
     {"id":{"name":"spr_jugador_salto","path":"sprites/spr_jugador_salto/spr_jugador_salto.yy",},},
+    {"id":{"name":"spr_jugador_ud_arriba","path":"sprites/spr_jugador_ud_arriba/spr_jugador_ud_arriba.yy",},},
+    {"id":{"name":"spr_jugador_ud_ataque","path":"sprites/spr_jugador_ud_ataque/spr_jugador_ud_ataque.yy",},},
+    {"id":{"name":"spr_jugador_ud_correr","path":"sprites/spr_jugador_ud_correr/spr_jugador_ud_correr.yy",},},
+    {"id":{"name":"spr_jugador_ud_emerger","path":"sprites/spr_jugador_ud_emerger/spr_jugador_ud_emerger.yy",},},
+    {"id":{"name":"spr_jugador_ud_excavar","path":"sprites/spr_jugador_ud_excavar/spr_jugador_ud_excavar.yy",},},
+    {"id":{"name":"spr_jugador_ud_idle","path":"sprites/spr_jugador_ud_idle/spr_jugador_ud_idle.yy",},},
+    {"id":{"name":"spr_jugador_ud_subir","path":"sprites/spr_jugador_ud_subir/spr_jugador_ud_subir.yy",},},
     {"id":{"name":"spr_jugador","path":"sprites/spr_jugador/spr_jugador.yy",},},
     {"id":{"name":"spr_proyectil","path":"sprites/spr_proyectil/spr_proyectil.yy",},},
     {"id":{"name":"spr_solid","path":"sprites/spr_solid/spr_solid.yy",},},
@@ -72,6 +81,7 @@
   "RoomOrderNodes":[
     {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
     {"roomId":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
+    {"roomId":{"name":"Room_Underdog","path":"rooms/Room_Underdog/Room_Underdog.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[

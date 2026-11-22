@@ -2,5 +2,6 @@
 enum Estilo
 {
     BASE,
-    SWORDMASTER
+    SWORDMASTER,
+    UNDERDOG
 }
