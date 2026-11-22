@@ -97,3 +97,12 @@ recibir_impacto = function(_damage, _knockback_x, _knockback_y, _stagger)
     combo_ventana = combo_ventana_max;
     var _bonus_combo_largo = 1.0 + max(0, combo_hits - 3) * 0.1;
 };
+
+// CAMINATA BASE
+vel_caminar = 1.5;          // 0 = no camina (ej. saco de pruebas o torreta estática)
+caminar_habilitado = true;  // Permite apagar la caminata temporalmente si lo necesitas
+// PATRULLA Y DETECCIÓN DEL JUGADOR
+dir_patrulla = -1;          // -1 = izquierda, 1 = derecha
+rango_deteccion = 180;      // Distancia en píxeles para empezar a perseguir al jugador
+evitar_bordes = true;       // Evita caer al vacío al patrullar o perseguir
+margen_borde = 8;           // Píxeles por delante para comprobar suelo (obj_solid)

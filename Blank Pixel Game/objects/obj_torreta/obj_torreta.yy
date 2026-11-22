@@ -3,7 +3,8 @@
   "%Name":"obj_torreta",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},],
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+  ],
   "managed":true,
   "name":"obj_torreta",
   "overriddenProperties":[],
@@ -11,7 +12,10 @@
     "name":"Blank Pixel Game",
     "path":"Blank Pixel Game.yyp",
   },
-  "parentObjectId":{"name":"obj_enemigo","path":"objects/obj_enemigo/obj_enemigo.yy",},
+  "parentObjectId":{
+    "name":"obj_enemigo",
+    "path":"objects/obj_enemigo/obj_enemigo.yy",
+  },
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
@@ -29,7 +33,10 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":{"name":"spr_torreta","path":"sprites/spr_torreta/spr_torreta.yy",},
+  "spriteId":{
+    "name":"spr_torreta",
+    "path":"sprites/spr_torreta/spr_torreta.yy",
+  },
   "spriteMaskId":null,
   "visible":true,
 }

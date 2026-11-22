@@ -10,3 +10,5 @@ proyectil_velocidad = 4;
 rango = 900;
 
 lanzable = false;           // fija al suelo: recibe daño pero no se mueve
+
+vel_caminar = 0

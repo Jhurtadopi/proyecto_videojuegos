@@ -10,6 +10,81 @@ if (instance_exists(obj_jugador) && obj_jugador.x != x)
     mirando = sign(obj_jugador.x - x);
 }
 
+// --- CAMINATA BASE: PATRULLA IZQ/DER Y BÚSQUEDA POR RANGO ---
+var _esta_aturdido = (variable_instance_exists(id, "aturdido_timer") && aturdido_timer > 0)
+                  || (variable_instance_exists(id, "tiempo_desestabilizado") && tiempo_desestabilizado > 0);
+
+var _en_suelo = place_meeting(x, y + 1, obj_solid);
+var _vel_cam_x = 0;
+
+if (caminar_habilitado && vel_caminar > 0 && estado == EnemyState.NORMAL && !_esta_aturdido && _en_suelo)
+{
+    var _jugador_cerca = false;
+    var _dir_objetivo = dir_patrulla;
+
+    // 1. Comprobar si el jugador está dentro del rango de detección
+    if (instance_exists(obj_jugador))
+    {
+        var _j = instance_nearest(x, y, obj_jugador);
+        var _dist = point_distance(x, y, _j.x, _j.y);
+
+        if (_dist <= rango_deteccion && _j.x != x)
+        {
+            _jugador_cerca = true;
+            _dir_objetivo = sign(_j.x - x);
+            mirando = _dir_objetivo;
+        }
+    }
+
+    // 2. Si NO busca al jugador, sigue el ciclo de izquierda a derecha
+    if (!_jugador_cerca)
+    {
+        // Girar si choca con una pared sólida en la dirección de patrulla
+        if (place_meeting(x + dir_patrulla * max(1, vel_caminar), y, obj_solid))
+        {
+            dir_patrulla = -dir_patrulla;
+        }
+        else if (evitar_bordes)
+        {
+            // Girar si se acaba el suelo adelante
+            var _hay_suelo = place_meeting(x + dir_patrulla * margen_borde, y + 1, obj_solid);
+            if (!_hay_suelo)
+            {
+                dir_patrulla = -dir_patrulla;
+            }
+        }
+
+        _dir_objetivo = dir_patrulla;
+        mirando = _dir_objetivo;
+        _vel_cam_x = _dir_objetivo * vel_caminar;
+    }
+    else
+    {
+        // Persiguiendo al jugador dentro del rango, pero frenando si se acaba el suelo
+        var _hay_suelo_pers = !evitar_bordes || place_meeting(x + _dir_objetivo * margen_borde, y + 1, obj_solid);
+        if (_hay_suelo_pers)
+        {
+            _vel_cam_x = _dir_objetivo * vel_caminar;
+        }
+        else
+        {
+            _vel_cam_x = 0;
+        }
+    }
+}
+
+// Movimiento horizontal total (empuje por golpe + caminata)
+var _vx_total = hsp + _vel_cam_x;
+
+if (place_meeting(x + _vx_total, y, obj_solid))
+{
+    while (!place_meeting(x + sign(_vx_total), y, obj_solid)) x += sign(_vx_total);
+    hsp = 0;
+    _vx_total = 0;
+}
+
+x += _vx_total;
+
 if (lanzable)
 {
     if (estado == EnemyState.KNOCKED_DOWN)

@@ -26,7 +26,7 @@ ataque_enemigo_timer = 0;
 // TIEMPOS
 ataque_preparacion = 10;
 ataque_duracion = 5;
-ataque_recuperacion = 15;
+ataque_recuperacion = 20;
 
 ataque_cooldown = 15;
 ataque_cooldown_timer = 0;
