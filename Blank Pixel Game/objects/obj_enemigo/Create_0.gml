@@ -99,10 +99,16 @@ recibir_impacto = function(_damage, _knockback_x, _knockback_y, _stagger)
 };
 
 // CAMINATA BASE
-vel_caminar = 1.5;          // 0 = no camina (ej. saco de pruebas o torreta estática)
+vel_caminar = 1;          // 0 = no camina (ej. saco de pruebas o torreta estática)
 caminar_habilitado = true;  // Permite apagar la caminata temporalmente si lo necesitas
 // PATRULLA Y DETECCIÓN DEL JUGADOR
 dir_patrulla = -1;          // -1 = izquierda, 1 = derecha
 rango_deteccion = 180;      // Distancia en píxeles para empezar a perseguir al jugador
+// DETECCION DIRECCIONAL DEL JUGADOR
+var _jugador = instance_find(obj_jugador, 0);
+
 evitar_bordes = true;       // Evita caer al vacío al patrullar o perseguir
 margen_borde = 8;           // Píxeles por delante para comprobar suelo (obj_solid)
+
+persecucion_duracion = 60; // Duración del ciclo de persecución en frames (ej. 1 seg a 60 FPS)
+persecucion_timer = 0;    // > 0 mientras el ciclo de persecución está activo

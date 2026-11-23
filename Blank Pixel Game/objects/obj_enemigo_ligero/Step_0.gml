@@ -16,14 +16,6 @@ var _distancia = point_distance(
     _jugador.x, _jugador.y
 );
 
-// Orientarse hacia el jugador
-if (_jugador.x > x) {
-    mirando = 1;
-}
-else {
-    mirando = -1;
-}
-
 // Cooldown
 if (ataque_cooldown_timer > 0) {
     ataque_cooldown_timer--;
@@ -35,7 +27,7 @@ if (ataque_cooldown_timer > 0) {
 
 if (!ataque_enemigo_activo
 && ataque_cooldown_timer <= 0
-&& _distancia <= ataque_alcance) {
+&& _distancia <= ataque_alcance && estado==EnemyState.NORMAL) {
 	image_blend=c_olive
     ataque_enemigo_activo = true;
 	ataque_hitbox_creada = false;

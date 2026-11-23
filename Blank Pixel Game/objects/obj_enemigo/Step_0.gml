@@ -4,12 +4,6 @@ flash_timer = max(0, flash_timer - 1);
 aturdido_timer = max(0, aturdido_timer - 1);
 conexion_underdog_timer = max(0, conexion_underdog_timer - 1);
 
-// Mirar hacia el jugador
-if (instance_exists(obj_jugador) && obj_jugador.x != x)
-{
-    mirando = sign(obj_jugador.x - x);
-}
-
 // --- CAMINATA BASE: PATRULLA IZQ/DER Y BÚSQUEDA POR RANGO ---
 var _esta_aturdido = (variable_instance_exists(id, "aturdido_timer") && aturdido_timer > 0)
                   || (variable_instance_exists(id, "tiempo_desestabilizado") && tiempo_desestabilizado > 0);
@@ -20,9 +14,12 @@ var _vel_cam_x = 0;
 if (caminar_habilitado && vel_caminar > 0 && estado == EnemyState.NORMAL && !_esta_aturdido && _en_suelo)
 {
     var _jugador_cerca = false;
+    var _jugador_adelante = false;
     var _dir_objetivo = dir_patrulla;
+    var _dir_jugador = 0
+    var _vel_cam_x = 0;
 
-    // 1. Comprobar si el jugador está dentro del rango de detección
+    // 1. Comprobar si el jugador está dentro del rango
     if (instance_exists(obj_jugador))
     {
         var _j = instance_nearest(x, y, obj_jugador);
@@ -31,22 +28,34 @@ if (caminar_habilitado && vel_caminar > 0 && estado == EnemyState.NORMAL && !_es
         if (_dist <= rango_deteccion && _j.x != x)
         {
             _jugador_cerca = true;
-            _dir_objetivo = sign(_j.x - x);
-            mirando = _dir_objetivo;
+            _dir_jugador = sign(_j.x - x);
+            _jugador_adelante = (_dir_jugador == mirando);
         }
     }
 
-    // 2. Si NO busca al jugador, sigue el ciclo de izquierda a derecha
-    if (!_jugador_cerca)
+    // Actualizar temporizador del ciclo de persecución
+    if (_jugador_cerca && _jugador_adelante)
     {
-        // Girar si choca con una pared sólida en la dirección de patrulla
+        // Si está mirando hacia el jugador en rango, inicia o renueva el ciclo
+        persecucion_timer = persecucion_duracion;
+    }
+    else if (persecucion_timer > 0)
+    {
+        // El ciclo sigue corriendo mientras tenga frames restantes
+        persecucion_timer--;
+    }
+
+    var _en_ciclo_persecucion = (persecucion_timer > 0);
+
+    // 2. Si NO está en ciclo de persecución, patrulla normal de izquierda a derecha
+    if (!_en_ciclo_persecucion)
+    {
         if (place_meeting(x + dir_patrulla * max(1, vel_caminar), y, obj_solid))
         {
             dir_patrulla = -dir_patrulla;
         }
         else if (evitar_bordes)
         {
-            // Girar si se acaba el suelo adelante
             var _hay_suelo = place_meeting(x + dir_patrulla * margen_borde, y + 1, obj_solid);
             if (!_hay_suelo)
             {
@@ -60,17 +69,35 @@ if (caminar_habilitado && vel_caminar > 0 && estado == EnemyState.NORMAL && !_es
     }
     else
     {
-        // Persiguiendo al jugador dentro del rango, pero frenando si se acaba el suelo
-        var _hay_suelo_pers = !evitar_bordes || place_meeting(x + _dir_objetivo * margen_borde, y + 1, obj_solid);
-        if (_hay_suelo_pers)
+        // 3. Dentro del ciclo de persecución:
+        if (_jugador_cerca && _jugador_adelante)
         {
-            _vel_cam_x = _dir_objetivo * vel_caminar;
+            // El jugador está delante: persigue en la dirección en la que mira
+            _dir_objetivo = mirando;
+            var _hay_suelo_pers = !evitar_bordes || place_meeting(x + _dir_objetivo * margen_borde, y + 1, obj_solid);
+
+            _vel_cam_x = _hay_suelo_pers ? (_dir_objetivo * vel_caminar) : 0;
         }
         else
         {
+            // Durante el ciclo el jugador está detrás (o fuera de rango): no hace nada
             _vel_cam_x = 0;
+
+            // Si en algún momento quieres que se dé la vuelta cuando el jugador esté detrás,
+            // descomenta esta línea:
+            if (_jugador_cerca && !_jugador_adelante) { mirando = _dir_jugador; }
         }
     }
+
+    // Aplicar movimiento horizontal de caminata (respetando tu física de hsp)
+    var _vx_total = hsp + _vel_cam_x;
+    if (place_meeting(x + _vx_total, y, obj_solid))
+    {
+        while (!place_meeting(x + sign(_vx_total), y, obj_solid)) x += sign(_vx_total);
+        hsp = 0;
+        _vx_total = 0;
+    }
+    x += _vx_total;
 }
 
 // Movimiento horizontal total (empuje por golpe + caminata)
