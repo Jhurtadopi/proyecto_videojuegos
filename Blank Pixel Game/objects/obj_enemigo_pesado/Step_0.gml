@@ -33,7 +33,6 @@ if (puede_bloquear
     {
         bloqueando = true;
         bloqueo_timer = bloqueo_duracion;
-
         bloqueo_intervalo_timer = bloqueo_intervalo;
     }
 }

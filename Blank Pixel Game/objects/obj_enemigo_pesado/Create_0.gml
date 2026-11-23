@@ -17,18 +17,21 @@ friccion_suelo = 0.88;
 bloqueando = false;
 puede_bloquear = true;
 
-bloqueo_duracion = 90;
+bloqueo_duracion = 30;
 bloqueo_timer = 0;
 
 bloqueo_resistencia = 3;
 bloqueo_golpes_recibidos = 0;
 
-bloqueo_recovery = 60;
+bloqueo_recovery = 40;
 bloqueo_recovery_timer = 0;
 
 bloqueo_reduccion_danio = 0.0;
 bloqueo_reduccion_knockback = 0.0;
 
 // COMPORTAMIENTO DEFENSIVO
-bloqueo_intervalo = 180;
+bloqueo_intervalo = 50;
 bloqueo_intervalo_timer = 0;
+
+reflejar_danio = true;
+porcentaje_reflejo = 0.30;

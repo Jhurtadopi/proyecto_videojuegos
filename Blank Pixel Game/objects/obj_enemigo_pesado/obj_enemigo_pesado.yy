@@ -13,8 +13,8 @@
     "path":"Blank Pixel Game.yyp",
   },
   "parentObjectId":{
-    "name":"obj_enemigo",
-    "path":"objects/obj_enemigo/obj_enemigo.yy",
+    "name":"obj_enemigo_ligero",
+    "path":"objects/obj_enemigo_ligero/obj_enemigo_ligero.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,

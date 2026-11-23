@@ -1,5 +1,9 @@
 if (!activo) exit;
 
+
+alarm[0] = 3;
+alarm[0] --;
+
 var _target = other.owner;
 
 if (_target == noone) exit;
@@ -55,9 +59,28 @@ if (_bloqueado)
 }
 
 // SI NO BLOQUEA, RECIBE EL ATAQUE NORMAL
+// DAÑO NORMAL AL OBJETIVO
 with (_target)
 {
     recibir_impacto(_damage, _kx, _ky, _stagger);
+}
+
+// REFLEJO DE DAÑO
+if (variable_instance_exists(_target, "reflejar_danio")
+&& variable_instance_exists(_target, "porcentaje_reflejo"))
+{
+    if (_target.reflejar_danio && instance_exists(owner))
+    {
+        var _danio_reflejado = _damage * _target.porcentaje_reflejo;
+
+        // DEVOLVER DAÑO AL ATACANTE
+        with (owner)
+        {
+            recibir_impacto(_danio_reflejado, 0, 0, 0);
+			instance_destroy();
+			exit;
+        }
+    }
 }
 
 // HITSTOP

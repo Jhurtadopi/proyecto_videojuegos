@@ -99,4 +99,24 @@ recibir_impacto = function(
         if (instance_exists(hurtbox)) instance_destroy(hurtbox);
         instance_destroy();
     }
+	// ACUMULAR STAGGER
+	stagger_acumulado += _stagger * resistencia_stagger;
+
+	// ACTIVAR STAGGER
+	if (stagger_acumulado >= stagger_umbral)
+	{
+	    estado = PlayerState.HURT;
+	    stagger_timer = stagger_duracion;
+
+	    stagger_acumulado = 0;
+	}
 };
+
+// SISTEMA DE STAGGER
+stagger_acumulado = 0;
+stagger_umbral = 30;
+
+stagger_duracion = 20;
+stagger_timer = 0;
+
+resistencia_stagger = 1;
