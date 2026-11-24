@@ -110,5 +110,5 @@ var _jugador = instance_find(obj_jugador, 0);
 evitar_bordes = true;       // Evita caer al vacío al patrullar o perseguir
 margen_borde = 8;           // Píxeles por delante para comprobar suelo (obj_solid)
 
-persecucion_duracion = 60; // Duración del ciclo de persecución en frames (ej. 1 seg a 60 FPS)
+persecucion_duracion = 30; // Duración del ciclo de persecución en frames (ej. 1 seg a 60 FPS)
 persecucion_timer = 0;    // > 0 mientras el ciclo de persecución está activo
