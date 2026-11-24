@@ -1,6 +1,7 @@
 t++;
 brillo = max(0, brillo - 1);
 if (pulsado && !nivel_canal_activo(canal)) pulsado = false;      // su grúa (ascensor) volvió: se rearma
+if (!pulsado && nivel_canal_activo(canal)) pulsado = true;       // canal recuperado de un checkpoint
 if (!pulsado)
 {
     var _j = nivel_jugador();

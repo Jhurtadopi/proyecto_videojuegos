@@ -1,1 +1,1 @@
-canal = 4;
+canal = 3;

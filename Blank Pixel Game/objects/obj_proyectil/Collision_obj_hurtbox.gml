@@ -31,6 +31,8 @@ with (_target)
 {
     recibir_impacto(_damage, _kx, _ky, _stagger);
 }
+// Balas del jugador (Gunner, proyectiles devueltos): cargan la barra general de ultimate
+if (equipo == "jugador") mec_ult_cargar(_damage);
 
 with (obj_controladores)
 {

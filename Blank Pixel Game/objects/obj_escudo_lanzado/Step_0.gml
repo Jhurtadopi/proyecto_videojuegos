@@ -44,6 +44,7 @@ switch (estado)
             var _di = danio_impacto;
             var _st = stagger_tick * 2;
             with (_e) recibir_impacto(_di, 0, 0, _st);
+            mec_ult_cargar(_di);
             with (obj_controladores) aplicar_hitstop(3);
             with (obj_camara) aplicar_temblor(3, 8);
             if (instance_exists(dueno)) with (dueno) mec_shield_chispas(other.x, other.y, make_color_rgb(255, 200, 80), 8, 14);
@@ -70,6 +71,7 @@ switch (estado)
             var _dt = danio_tick;
             var _stt = stagger_tick;
             with (objetivo) recibir_impacto(_dt, 0, 0, _stt);
+            mec_ult_cargar(_dt);
             if (instance_exists(dueno)) with (dueno) mec_shield_chispas(other.x, other.y, make_color_rgb(255, 200, 80), 4, 10);
         }
         if (clavado_timer <= 0) estado = 2;

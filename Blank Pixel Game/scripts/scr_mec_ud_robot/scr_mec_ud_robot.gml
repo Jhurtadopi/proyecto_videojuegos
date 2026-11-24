@@ -17,8 +17,8 @@
 
 function mec_ud_robot_crear()
 {
-    ub_carga = 0;
-    ub_max = 100;                   // daño necesario para llenar la barra
+    mec_ult_carga();                // la barra es la general compartida (scr_mec_comun)
+    ub_max = ULT_MAX;                   // daño necesario para llenar la barra
     ub_duracion = 20 * 60;          // frames que dura la barra llena (20 s a 60 FPS)
     ub_min_activar = 20;            // barra mínima para (re)activarlo
     ub_reduccion = 0.75;            // 75 % menos de daño
@@ -47,13 +47,13 @@ function mec_ud_robot_crear()
 
 function mec_ud_robot_lista()
 {
-    return mec_underdog_activo() && !ub_activo && ub_carga >= ub_min_activar;
+    return mec_underdog_activo() && !ub_activo && mec_ult_carga() >= ub_min_activar;
 }
 
 // Suma a la barra el daño hecho en estilo Underdog (no carga mientras el robot está activo)
 function mec_ud_robot_cargar(_cantidad)
 {
-    if (!ub_activo && mec_underdog_activo()) ub_carga = min(ub_max, ub_carga + _cantidad);
+    if (!ub_activo) mec_ult_cargar(_cantidad);      // barra general: carga en cualquier estilo
 }
 
 function mec_ud_robot_vapor(_x, _y, _n, _fuerza)
@@ -129,10 +129,9 @@ function mec_ud_robot_inicio()
     if (!ub_activo) return;
 
     // La barra baja mientras se usa
-    ub_carga -= ub_max / ub_duracion;
-    if (ub_carga <= 0)
+    mec_ult_set(mec_ult_carga() - ub_max / ub_duracion);
+    if (mec_ult_carga() <= 0)
     {
-        ub_carga = 0;
         mec_ud_robot_desactivar();
         return;
     }
@@ -177,7 +176,7 @@ function mec_ud_robot_fin()
 // Lo llama obj_hitbox_golpe cuando un golpe del jugador conecta
 function mec_ud_robot_al_golpear(_target, _damage)
 {
-    mec_ud_robot_cargar(_damage);
+    // (la carga de la barra ya la hace obj_hitbox_golpe con mec_swordmaster_ultimate_cargar)
     if (!ub_activo || !instance_exists(_target)) return;
 
     var _g = undefined;
@@ -265,7 +264,7 @@ function mec_ud_robot_dibujar_gui()
     var _x1 = _x2 - _ancho;
     var _y = 78;
     var _lista = mec_ud_robot_lista();
-    var _llena = ub_carga >= ub_max;
+    var _llena = mec_ult_carga() >= ub_max;
 
     draw_set_alpha(0.6);
     draw_set_color(c_black);
@@ -278,13 +277,13 @@ function mec_ud_robot_dibujar_gui()
 
     draw_set_alpha((_llena && !ub_activo) ? 0.7 + 0.3 * abs(sin(current_time / 120)) : 1);
     draw_set_color(ub_activo ? make_color_rgb(255, 150, 40) : (_lista ? c_white : make_color_rgb(255, 190, 90)));
-    draw_rectangle(_x1, _y, _x1 + _ancho * ub_carga / ub_max, _y + 8, false);
+    draw_rectangle(_x1, _y, _x1 + _ancho * mec_ult_carga() / ub_max, _y + 8, false);
     draw_set_alpha(1);
 
     draw_set_halign(fa_right);
     draw_set_color(ub_activo ? make_color_rgb(255, 190, 90) : (_lista ? c_white : c_ltgray));
     var _txt = "Robot";
-    if (ub_activo) _txt = "ROBOT " + string_format(ub_carga / ub_max * ub_duracion / 60, 1, 1) + " s (F: bajarse)";
+    if (ub_activo) _txt = "ROBOT " + string_format(mec_ult_carga() / ub_max * ub_duracion / 60, 1, 1) + " s (F: bajarse)";
     else if (_lista) _txt = "ROBOT LISTO: F";
     draw_text(_x2, _y + 12, _txt);
     draw_set_halign(fa_left);

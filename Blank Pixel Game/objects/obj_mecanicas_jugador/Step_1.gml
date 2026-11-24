@@ -13,14 +13,13 @@ if (keyboard_check_pressed(vk_backspace))
     exit;
 }
 
-// Cambiar de room (pruebas): F1 Room1, F2 Room2, F3 Room_Underdog
-if (keyboard_check_pressed(vk_f1)) { room_goto(Room1); exit; }
-if (keyboard_check_pressed(vk_f2)) { room_goto(Room2); exit; }
-if (keyboard_check_pressed(vk_f3)) { room_goto(Room_Underdog); exit; }
-if (keyboard_check_pressed(vk_f4)) { room_goto(Room_Shield); exit; }
-// Niveles (F5 / F6): empiezan desde el principio (sin checkpoint)
-if (keyboard_check_pressed(vk_f5)) { global.nivel_cp = undefined; room_goto(Nivel_1); exit; }
-if (keyboard_check_pressed(vk_f6)) { global.nivel_cp = undefined; room_goto(Nivel_2); exit; }
+// Cambiar de room (pruebas), desde el principio (sin checkpoint):
+// F1 Nivel 1, F2 jefe (Room_Boss), F3 Nivel 2, F4 Nivel 3, F5 jefe demonio
+if (keyboard_check_pressed(vk_f1)) { global.nivel_cp = undefined; room_goto(Nivel_1); exit; }
+if (keyboard_check_pressed(vk_f2)) { global.nivel_cp = undefined; room_goto(Room_Boss); exit; }
+if (keyboard_check_pressed(vk_f3)) { global.nivel_cp = undefined; room_goto(Nivel_2); exit; }
+if (keyboard_check_pressed(vk_f4)) { global.nivel_cp = undefined; room_goto(Nivel_3); exit; }
+if (keyboard_check_pressed(vk_f5)) { global.nivel_cp = undefined; room_goto(Jefe_Demonio); exit; }
 
 jugador = instance_exists(obj_jugador) ? instance_find(obj_jugador, 0) : noone;
 
@@ -35,6 +34,7 @@ if (jugador == noone || en_hitstop) exit;
 var _dir = keyboard_check(ord("D")) - keyboard_check(ord("A"));
 if (_dir != 0) mirando = _dir;
 
+mec_plataformas_inicio();     // ¿está parado sobre una plataforma móvil?
 x_inicio = jugador.x;
 y_inicio = jugador.y;
 

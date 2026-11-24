@@ -120,6 +120,9 @@ OBJ["obj_nivel"] = (None, None, {
 // Código de creación: nombre, subtitulo, cielo_arriba / cielo_abajo (colores).
 nombre = "Nivel";
 subtitulo = "";
+// Profundidad entre la capa de fondo de la room (100) y las instancias (0): el fondo y el terreno se
+// dibujan en Draw (no en Draw Begin, que queda tapado por el color de la capa de fondo)
+depth = 50;
 cielo_arriba = make_color_rgb(10, 10, 26);
 cielo_abajo = make_color_rgb(46, 16, 58);
 neon_a = make_color_rgb(0, 230, 255);
@@ -128,12 +131,27 @@ neon_b = make_color_rgb(230, 40, 160);
 inicio_x = 0;
 inicio_y = 0;
 colocado = false;
+
+// Rooms de jefe sin portal propio: al no quedar instancias de "meta_al_vencer" aparece el portal a "siguiente"
+meta_al_vencer = noone;
+siguiente = -1;
+meta_hecha = false;
 t_inicio = current_time;
 t_final = -1;
 banner = 240;
 
 global.nivel_canales = [];
+// Al reaparecer en un checkpoint se recuperan los canales (compuertas, botones) que ya estaban abiertos
+if (variable_global_exists("nivel_cp") && is_struct(global.nivel_cp) && global.nivel_cp.room == room
+    && variable_struct_exists(global.nivel_cp, "canales"))
+{
+    var _cc = global.nivel_cp.canales;
+    array_copy(global.nivel_canales, 0, _cc, 0, array_length(_cc));
+}
 global.nivel_invulnerable = 0;
+global.nivel_llaves = 0;
+if (variable_global_exists("nivel_cp") && is_struct(global.nivel_cp) && global.nivel_cp.room == room
+    && variable_struct_exists(global.nivel_cp, "llaves")) global.nivel_llaves = global.nivel_cp.llaves;
 global.nivel_flash = 0;
 if (variable_global_exists("nivel_cp") && is_struct(global.nivel_cp) && global.nivel_cp.room != room) global.nivel_cp = undefined;
 
@@ -178,8 +196,17 @@ if (!colocado)
 
 // Caída al vacío
 if (_j != noone && _j.y > room_height + 96) nivel_reaparecer(15);
+
+// Jefe vencido: portal de salida
+if (meta_al_vencer != noone && colocado && !meta_hecha && instance_number(meta_al_vencer) == 0)
+{
+    meta_hecha = true;
+    var _m = instance_create_layer(room_width / 2, inicio_y, "Instances", obj_meta);
+    _m.siguiente = siguiente;
+    with (obj_camara) aplicar_temblor(8, 30);
+}
 ''',
-"Draw_72": r'''// Draw Begin: corre antes de todos los Draw, así el fondo y el terreno quedan detrás de todo
+"Draw_0": r'''// Fondo y terreno (depth 50: encima del color de fondo de la room, debajo de todo lo demás)
 var _cam = view_camera[0];
 var _cx = 0, _cy = 0, _vw = room_width, _vh = room_height;
 if (_cam != -1)
@@ -337,6 +364,7 @@ image_speed = 0;
 "Step_0": r'''t++;
 brillo = max(0, brillo - 1);
 if (pulsado && !nivel_canal_activo(canal)) pulsado = false;      // su grúa (ascensor) volvió: se rearma
+if (!pulsado && nivel_canal_activo(canal)) pulsado = true;       // canal recuperado de un checkpoint
 if (!pulsado)
 {
     var _j = nivel_jugador();
@@ -457,11 +485,9 @@ var _dy = _ny - plataforma.y;
 
 if (_dx != 0 || _dy != 0)
 {
-    // El jugador parado encima viaja con la plataforma
-    if (_encima && _dy < 0) mec_mover_con_choque(_j, _dx, _dy);     // subiendo: primero el jugador
+    // (el jugador parado encima viaja con ella gracias a scr_mec_plataformas)
     plataforma.x = _nx;
     plataforma.y = _ny;
-    if (_encima && _dy >= 0) mec_mover_con_choque(_j, _dx, _dy);    // bajando o de lado: después
     carro_x = _nx;
 }
 ''',
@@ -567,6 +593,9 @@ draw_set_color(c_white);
 OBJ["obj_checkpoint"] = ("spr_nivel_checkpoint", None, {
 "Create_0": r'''// Checkpoint: al tocarlo guarda el punto de reaparición (solo si está más adelante que el
 // actual) y cura 30 de vida. Sobrevive a R / morir (global.nivel_cp) mientras sigas en la room.
+// Código de creación: orden (posición en el recorrido; los niveles no siempre avanzan a la derecha).
+// Guarda también los canales activos, para que las compuertas abiertas sigan abiertas al reaparecer.
+orden = x;
 activo = false;
 revisado = false;
 anim = 0;
@@ -576,19 +605,23 @@ image_speed = 0;
 "Step_0": r'''t++;
 anim = max(0, anim - 1);
 var _cp = (variable_global_exists("nivel_cp") && is_struct(global.nivel_cp) && global.nivel_cp.room == room) ? global.nivel_cp : undefined;
+var _cp_orden = (!is_undefined(_cp) && variable_struct_exists(_cp, "orden")) ? _cp.orden : -1;
 if (!revisado)
 {
     revisado = true;
-    if (!is_undefined(_cp) && _cp.x == x && _cp.y == y) activo = true;
+    if (!is_undefined(_cp) && orden <= _cp_orden) activo = true;
 }
 var _j = nivel_jugador();
-if (!activo && _j != noone && place_meeting(x, y, _j) && (is_undefined(_cp) || x > _cp.x))
+if (!activo && _j != noone && place_meeting(x, y, _j) && orden > _cp_orden)
 {
-    global.nivel_cp = { room: room, x: x, y: y };
+    var _canales = [];
+    if (variable_global_exists("nivel_canales")) array_copy(_canales, 0, global.nivel_canales, 0, array_length(global.nivel_canales));
+    var _llaves = variable_global_exists("nivel_llaves") ? global.nivel_llaves : 0;
+    global.nivel_cp = { room: room, x: x, y: y, orden: orden, canales: _canales, llaves: _llaves };
     activo = true;
     anim = 70;
     _j.vida = min(_j.vida_maxima, _j.vida + 30);
-    with (obj_checkpoint) if (id != other.id && x < other.x) activo = true;   // los anteriores quedan encendidos
+    with (obj_checkpoint) if (id != other.id && orden < other.orden) activo = true;   // los anteriores quedan encendidos
 }
 image_index = activo ? 1 : 0;
 ''',
@@ -603,6 +636,297 @@ if (activo)
     draw_set_alpha(1);
 }
 if (anim > 0) nivel_texto(x, y - 70 - (70 - anim) * 0.4, "CHECKPOINT  +30 vida", make_color_rgb(0, 230, 255), min(1, anim / 20));
+draw_set_color(c_white);
+'''})
+
+# ---------------- obj_arena ----------------
+OBJ["obj_arena"] = (None, None, {
+"Create_0": r'''// Arena: zona (ancho x alto px desde su esquina superior izquierda). Cuando el jugador entra se activa y,
+// cuando ya no queda ningún enemigo dentro, activa su canal (abre la compuerta de la salida).
+// Código de creación: ancho, alto, canal; opcionales: mensaje, jefe_nombre (muestra la barra de vida del
+// enemigo con más vida máxima de la zona, p. ej. un minijefe).
+// canal_cierre: canal que se activa al entrar (cierra las obj_puerta_cierre: no se puede salir).
+// premio: objeto que aparece donde murió el jefe al vencer a todos (p. ej. obj_llave).
+mensaje = "Acaba con todos para abrir la salida";
+jefe_nombre = "";
+jefe = noone;
+canal_cierre = -1;
+premio = noone;
+premio_x = 0;
+premio_y = 0;
+ancho = 320;
+alto = 320;
+canal = 1;
+activa = false;
+abierta = false;
+restantes = 0;
+aviso = 0;
+''',
+"Step_0": r'''aviso = max(0, aviso - 1);
+if (abierta) exit;
+if (nivel_canal_activo(canal)) { abierta = true; exit; }          // ya abierta (canal recuperado de un checkpoint)
+var _x1 = x, _y1 = y, _x2 = x + ancho, _y2 = y + alto;
+var _n = 0;
+var _mj = noone, _mv = -1;
+with (obj_enemigo) if (x >= _x1 && x <= _x2 && y >= _y1 && y <= _y2 + 40)
+{
+    _n++;
+    if (vida_maxima > _mv) { _mv = vida_maxima; _mj = id; }
+}
+if (jefe_nombre != "")
+{
+    if (!instance_exists(jefe)) jefe = _mj;
+    if (instance_exists(jefe))
+    {
+        if (!activa) jefe.caminar_habilitado = false;     // espera en su sala hasta que entre el jugador
+        premio_x = jefe.x;
+        premio_y = jefe.y;
+        if (!(jefe.x >= _x1 && jefe.x <= _x2)) _n++;      // cuenta aunque se haya salido de la zona
+    }
+}
+restantes = _n;
+var _j = nivel_jugador();
+if (!activa && _j != noone && point_in_rectangle(_j.x, _j.y - 32, _x1, _y1, _x2, _y2))
+{
+    activa = true;
+    with (obj_camara) aplicar_temblor(4, 20);
+    if (canal_cierre >= 0) nivel_activar_canal(canal_cierre);
+    if (instance_exists(jefe)) jefe.caminar_habilitado = true;
+}
+if (activa && _n == 0)
+{
+    abierta = true;
+    aviso = 150;
+    nivel_activar_canal(canal);
+    if (premio != noone)
+    {
+        if (premio_x == 0) { premio_x = x + ancho / 2; premio_y = y + alto; }
+        instance_create_layer(premio_x, premio_y - 40, "Instances", premio);
+    }
+    with (obj_camara) aplicar_temblor(6, 30);
+}
+''',
+"Draw_64": r'''var _gw = display_get_gui_width();
+draw_set_halign(fa_center);
+if (activa && !abierta)
+{
+    draw_set_color(c_black);
+    draw_text(_gw / 2 + 1, 41, mensaje + ": " + string(restantes));
+    draw_set_color(make_color_rgb(255, 90, 90));
+    draw_text(_gw / 2, 40, mensaje + ": " + string(restantes));
+    if (jefe_nombre != "" && instance_exists(jefe))
+    {
+        var _gh = display_get_gui_height();
+        var _bw = 520, _bx = _gw / 2 - _bw / 2, _by = _gh - 64;
+        var _f = clamp(jefe.vida / max(1, jefe.vida_maxima), 0, 1);
+        draw_set_color(c_black);
+        draw_rectangle(_bx - 3, _by - 3, _bx + _bw + 3, _by + 17, false);
+        draw_set_color(make_color_rgb(60, 20, 24));
+        draw_rectangle(_bx, _by, _bx + _bw, _by + 14, false);
+        draw_set_color(make_color_rgb(230, 150, 40));
+        draw_rectangle(_bx, _by, _bx + _bw * _f, _by + 14, false);
+        draw_set_color(c_black);
+        draw_text(_gw / 2 + 1, _by - 21, jefe_nombre);
+        draw_set_color(make_color_rgb(255, 210, 120));
+        draw_text(_gw / 2, _by - 22, jefe_nombre);
+    }
+}
+else if (aviso > 0)
+{
+    draw_set_alpha(min(1, aviso / 30));
+    draw_set_color(make_color_rgb(0, 230, 255));
+    draw_text_transformed(_gw / 2, 40, (premio == obj_llave) ? "RECOGE LA LLAVE" : ((jefe_nombre != "") ? "CAMINO ABIERTO" : "ZONA DESPEJADA"), 1.6, 1.6, 0);
+    draw_set_alpha(1);
+}
+draw_set_halign(fa_left);
+draw_set_color(c_white);
+'''})
+
+# ---------------- obj_torre_deco ----------------
+OBJ["obj_torre_deco"] = (None, None, {
+"Create_0": r'''// Torre de vigilancia decorativa (no choca): estructura de celosía desde el suelo (x, y) hasta "alto"
+// px más arriba, donde está la plataforma con la centinela. Se dibuja detrás de las instancias.
+// Código de creación: alto.
+alto = 320;
+t = irandom(100);
+depth = 40;
+''',
+"Step_0": r'''t++;
+''',
+"Draw_0": r'''var _top = y - alto;
+var _w = 22;
+var _osc = make_color_rgb(28, 32, 48);
+var _med = make_color_rgb(58, 64, 88);
+// Patas
+draw_set_color(_osc);
+draw_rectangle(x - _w, _top, x - _w + 5, y, false);
+draw_rectangle(x + _w - 5, _top, x + _w, y, false);
+draw_set_color(_med);
+draw_line(x - _w + 5, _top, x - _w + 5, y);
+draw_line(x + _w - 5, _top, x + _w - 5, y);
+// Celosía
+for (var _yy = _top; _yy < y; _yy += 32)
+{
+    var _y2 = min(y, _yy + 32);
+    draw_set_color(_osc);
+    draw_line_width(x - _w + 3, _yy, x + _w - 3, _y2, 3);
+    draw_line_width(x + _w - 3, _yy, x - _w + 3, _y2, 3);
+    draw_set_color(_med);
+    draw_line_width(x - _w, _yy, x + _w, _yy, 2);
+}
+// Base
+draw_set_color(_osc);
+draw_rectangle(x - _w - 8, y - 10, x + _w + 8, y, false);
+draw_set_color(_med);
+draw_line(x - _w - 8, y - 10, x + _w + 8, y - 10);
+// Luz de aviso
+gpu_set_blendmode(bm_add);
+draw_set_color(make_color_rgb(255, 40, 40));
+draw_set_alpha(0.35 + 0.35 * abs(sin(t * 0.05)));
+draw_circle(x - _w + 2, _top + 6, 4, false);
+draw_circle(x + _w - 2, _top + 6, 4, false);
+gpu_set_blendmode(bm_normal);
+draw_set_alpha(1);
+draw_set_color(c_white);
+'''})
+
+# ---------------- obj_llave ----------------
+OBJ["obj_llave"] = ("spr_nivel_llave", None, {
+"Create_0": r'''// Llave que suelta el minijefe. Salta, cae, flota y se recoge al pasar cerca (global.nivel_llaves).
+// La gasta una obj_puerta_llave.
+vsp = -6;
+t = 0;
+recogida = 0;
+image_speed = 0;
+''',
+"Step_0": r'''t++;
+if (recogida > 0) { recogida--; y -= 1; if (recogida <= 0) instance_destroy(); exit; }
+var _j = nivel_jugador();
+// Cerca, o tras 1,5 s en el suelo, vuela hacia el jugador (para que no se pueda dejar olvidada)
+if (_j != noone && (point_distance(x, y, _j.x, _j.y - 30) < 80 || t > 90))
+{
+    x = lerp(x, _j.x, 0.2);
+    y = lerp(y, _j.y - 30, 0.2);
+    vsp = 0;
+    if (point_distance(x, y, _j.x, _j.y - 30) < 18)
+    {
+        global.nivel_llaves = (variable_global_exists("nivel_llaves") ? global.nivel_llaves : 0) + 1;
+        recogida = 60;
+        with (obj_camara) aplicar_temblor(3, 10);
+    }
+    exit;
+}
+vsp = min(vsp + 0.3, 8);
+if (place_meeting(x, y + vsp, obj_solid))
+{
+    while (!place_meeting(x, y + sign(vsp), obj_solid)) y += sign(vsp);
+    vsp = 0;
+}
+y += vsp;
+''',
+"Draw_0": r'''if (recogida > 0) { nivel_texto(x, y - 14, "LLAVE OBTENIDA", make_color_rgb(255, 220, 90), recogida / 60); exit; }
+var _b = (vsp == 0) ? sin(t * 0.1) * 3 - 6 : 0;
+gpu_set_blendmode(bm_add);
+draw_set_color(make_color_rgb(255, 200, 60));
+draw_set_alpha(0.25 + 0.12 * sin(t * 0.15));
+draw_circle(x, y - 8 + _b, 16, false);
+gpu_set_blendmode(bm_normal);
+draw_set_alpha(1);
+draw_sprite(sprite_index, (t div 15) mod 2, x, y + _b);
+var _j = nivel_jugador();
+if (_j != noone && point_distance(x, y, _j.x, _j.y) < 260) nivel_texto(x, y - 24 + _b, "LLAVE", make_color_rgb(255, 220, 90), 0.9);
+draw_set_color(c_white);
+'''})
+
+# ---------------- obj_puerta_llave ----------------
+OBJ["obj_puerta_llave"] = ("spr_nivel_cerradura", "obj_puerta", {
+"Create_0": r'''// Puerta blindada con cerradura (hija de obj_puerta: sólida). Se abre al acercarse con una llave
+// (gasta una de global.nivel_llaves) y activa su canal, así queda abierta al reaparecer en un checkpoint.
+// Código de creación: canal; opcional requiere (canal que debe estar activo para poder usar la llave,
+// p. ej. el de la arena final: primero hay que vencer a todos).
+canal = 7;
+requiere = -1;
+abriendo = 0;
+t = 0;
+image_speed = 0;
+''',
+"Step_0": r'''t++;
+if (nivel_canal_activo(canal))
+{
+    if (abriendo == 0) with (obj_camara) aplicar_temblor(5, 24);
+    abriendo = min(1, abriendo + 1 / 45);
+    y -= 2;
+    if (abriendo >= 1) instance_destroy();
+    exit;
+}
+var _j = nivel_jugador();
+if (_j != noone && abs(_j.x - x) < 56 && _j.y > bbox_top && _j.y - 64 < bbox_bottom
+    && variable_global_exists("nivel_llaves") && global.nivel_llaves > 0
+    && (requiere < 0 || nivel_canal_activo(requiere)))
+{
+    global.nivel_llaves--;
+    nivel_activar_canal(canal);
+}
+''',
+"Draw_0": r'''draw_sprite_ext(sprite_index, 0, x, y, 1, 1, 0, c_white, 1 - abriendo);
+if (abriendo > 0)
+{
+    gpu_set_blendmode(bm_add);
+    draw_set_color(make_color_rgb(255, 210, 80));
+    draw_set_alpha(0.4 * (1 - abriendo));
+    draw_rectangle(bbox_left - 4, bbox_top, bbox_right + 4, bbox_bottom, false);
+    gpu_set_blendmode(bm_normal);
+    draw_set_alpha(1);
+}
+var _j = nivel_jugador();
+if (abriendo == 0 && _j != noone && point_distance(x, y, _j.x, _j.y) < 220)
+{
+    var _tiene = variable_global_exists("nivel_llaves") && global.nivel_llaves > 0;
+    var _txt = _tiene ? "Acercate para abrir" : "Cerrada: necesitas la llave del guardian";
+    if (_tiene && requiere >= 0 && !nivel_canal_activo(requiere)) _txt = "Acaba con todos para usar la llave";
+    nivel_texto(x, bbox_top - 8, _txt, make_color_rgb(255, 210, 90), 0.9);
+}
+draw_set_color(c_white);
+'''})
+
+# ---------------- obj_puerta_cierre ----------------
+OBJ["obj_puerta_cierre"] = ("spr_nivel_puerta", "obj_puerta", {
+"Create_0": r'''// Compuerta que empieza ABIERTA y cae de golpe al activarse canal_cierre (la activa una obj_arena cuando
+// entra el jugador). Se vuelve a abrir con canal_abrir. Abierta se aparta fuera de la room (sin colisión).
+// Código de creación: canal_cierre, canal_abrir.
+canal_cierre = 6;
+canal_abrir = 5;
+canal = -1;
+x0 = x;
+y0 = y;
+p = 0;              // 0 abierta .. 1 cerrada
+t = 0;
+image_speed = 0;
+y = y0 + 100000;
+''',
+"Step_0": r'''t++;
+var _cerrar = nivel_canal_activo(canal_cierre) && !nivel_canal_activo(canal_abrir);
+if (_cerrar)
+{
+    if (p == 0) with (obj_camara) aplicar_temblor(6, 18);
+    p = min(1, p + 1 / 8);
+    y = y0;
+}
+else
+{
+    p = max(0, p - 1 / 30);
+    y = (p > 0) ? y0 : y0 + 100000;
+}
+''',
+"Draw_0": r'''if (p <= 0) exit;
+var _dy = -(1 - p) * sprite_get_height(sprite_index);
+draw_sprite_ext(sprite_index, 0, x0, y0 + _dy, 1, 1, 0, c_white, p * (0.85 + 0.15 * sin(t * 0.4)));
+gpu_set_blendmode(bm_add);
+draw_set_color(make_color_rgb(255, 60, 60));
+draw_set_alpha(0.15 * p);
+draw_rectangle(x0 - 22, y0 - 128 + _dy, x0 + 22, y0 + _dy, false);
+gpu_set_blendmode(bm_normal);
+draw_set_alpha(1);
 draw_set_color(c_white);
 '''})
 

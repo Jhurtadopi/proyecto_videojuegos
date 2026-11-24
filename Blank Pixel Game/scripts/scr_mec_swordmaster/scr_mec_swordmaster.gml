@@ -38,8 +38,8 @@ function mec_swordmaster_crear()
 
     // ULTIMATE "JUICIO DIMENSIONAL" (F). Por ahora se carga con el daño hecho; cuando existan los
     // rangos de estilo, la condición será estar en rango S (cambiar mec_swordmaster_ultimate_lista).
-    sm_ult_carga = 0;
-    sm_ult_max = 100;               // daño necesario para cargarlo
+    mec_ult_carga();                // barra general compartida (scr_mec_comun)
+    sm_ult_max = ULT_MAX;           // barra general llena (scr_mec_comun)
     sm_ult_fase = 0;                // 0 inactivo, 1 cortes (mundo congelado), 2 detonación
     sm_ult_timer = 0;
     sm_ult_preparacion = 40;        // frames de cortes antes de detonar
@@ -246,13 +246,13 @@ function mec_swordmaster_impacto(_j)
 
 function mec_swordmaster_ultimate_lista()
 {
-    return global.estilo == Estilo.SWORDMASTER && sm_ult_carga >= sm_ult_max;
+    return global.estilo == Estilo.SWORDMASTER && mec_ult_carga() >= sm_ult_max;
 }
 
 function mec_swordmaster_ultimate_cargar(_cantidad)
 {
-    if (sm_ult_fase == 0 && global.estilo == Estilo.SWORDMASTER)
-        sm_ult_carga = min(sm_ult_max, sm_ult_carga + _cantidad);
+    // Carga la barra general en cualquier estilo
+    if (sm_ult_fase == 0) mec_ult_cargar(_cantidad);
 }
 
 function mec_swordmaster_ultimate_paso()
@@ -274,7 +274,7 @@ function mec_swordmaster_ultimate_paso()
             }
             sm_ult_objetivos = _lista;
 
-            sm_ult_carga = 0;
+            mec_ult_set(mec_ult_carga() - sm_ult_max);
             sm_ult_fase = 1;
             sm_ult_timer = sm_ult_preparacion;
             sm_ult_cortes = [];
@@ -412,7 +412,7 @@ function mec_swordmaster_ultimate_dibujar()
         draw_rectangle(_x1b, _yb, _x2b, _yb + 8, false);
         draw_set_alpha(_llena ? 0.7 + 0.3 * abs(sin(current_time / 120)) : 1);
         draw_set_color(_llena ? c_white : make_color_rgb(0, 230, 255));
-        draw_rectangle(_x1b, _yb, _x1b + _ancho * sm_ult_carga / sm_ult_max, _yb + 8, false);
+        draw_rectangle(_x1b, _yb, _x1b + _ancho * mec_ult_carga() / sm_ult_max, _yb + 8, false);
         draw_set_alpha(1);
         draw_set_halign(fa_right);
         draw_set_color(_llena ? c_white : c_ltgray);

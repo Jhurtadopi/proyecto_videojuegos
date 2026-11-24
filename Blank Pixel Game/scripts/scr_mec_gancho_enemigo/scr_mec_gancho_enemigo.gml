@@ -45,6 +45,46 @@ function mec_gancho_enemigo_crear()
     ge_arrastre_max = 120;          // frames máximos arrastrando (luego se lanza solo)
     ge_vel_lanzar = 16;             // velocidad del lanzamiento al soltar
     ge_danio_lanzar = 4;
+
+    // ENEMIGO COMO PROYECTIL: el lanzado choca con otros enemigos y ambos reciben daño
+    ge_proyectiles = [];            // [{e, t, golpeados}]
+    ge_choque_danio = 10;           // al enemigo golpeado
+    ge_choque_danio_lanzado = 6;    // al enemigo lanzado
+    ge_choque_stagger = 30;
+}
+
+// Revisa los enemigos lanzados con el gancho: si chocan con otro enemigo, daño a los dos
+function mec_gancho_enemigo_proyectiles()
+{
+    for (var i = array_length(ge_proyectiles) - 1; i >= 0; i--)
+    {
+        var _pr = ge_proyectiles[i];
+        _pr.t--;
+        var _e = _pr.e;
+        if (!instance_exists(_e) || _pr.t <= 0) { array_delete(ge_proyectiles, i, 1); continue; }
+        var _vel = abs(_e.hsp) + abs(_e.vsp);
+        if (_vel < 3 && _pr.t < 40) { array_delete(ge_proyectiles, i, 1); continue; }    // ya se detuvo
+
+        var _lista = ds_list_create();
+        var _n = 0;
+        with (_e) _n = instance_place_list(x, y, obj_enemigo, _lista, false);
+        for (var k = 0; k < _n; k++)
+        {
+            var _o = _lista[| k];
+            if (_o == _e || !instance_exists(_o) || array_contains(_pr.golpeados, _o)) continue;
+            array_push(_pr.golpeados, _o);
+            var _dir = (_e.hsp == 0) ? sign(_o.x - _e.x) : sign(_e.hsp);
+            if (_dir == 0) _dir = 1;
+            var _d1 = ge_choque_danio, _d2 = ge_choque_danio_lanzado, _st = ge_choque_stagger;
+            with (_o) recibir_impacto(_d1, _dir * 7, -5, _st);
+            if (instance_exists(_e)) with (_e) recibir_impacto(_d2, -_dir * 2, -3, _st);
+            with (obj_controladores) aplicar_hitstop(6);
+            with (obj_camara) aplicar_temblor(5, 10);
+            if (instance_exists(_o)) instance_create_layer((_o.x + _e.x) / 2, _o.y, "Instances", obj_fx_estampada, { fuerza: 0.3, radio: 40 });
+            if (!instance_exists(_e)) break;
+        }
+        ds_list_destroy(_lista);
+    }
 }
 
 function mec_gancho_enemigo_activo()
@@ -127,6 +167,7 @@ function mec_gancho_enemigo_inicio()
 // End Step, DESPUÉS de mec_gancho_fin
 function mec_gancho_enemigo_fin()
 {
+    mec_gancho_enemigo_proyectiles();
     if (ge_estado == GanchoEnemigo.INACTIVO) return;
 
     var _j = jugador;
@@ -199,6 +240,7 @@ function mec_gancho_enemigo_fin()
                 var _dl = ge_danio_lanzar;
                 var _sl = ge_stagger;
                 with (_e) recibir_impacto(_dl, _lx, _ly, _sl);
+                if (instance_exists(_e)) array_push(ge_proyectiles, { e: _e, t: 60, golpeados: [] });
                 with (obj_controladores) aplicar_hitstop(3);
                 mec_gancho_enemigo_terminar();
             }

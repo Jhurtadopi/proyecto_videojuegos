@@ -1,0 +1,10 @@
+if (p <= 0) exit;
+var _dy = -(1 - p) * sprite_get_height(sprite_index);
+draw_sprite_ext(sprite_index, 0, x0, y0 + _dy, 1, 1, 0, c_white, p * (0.85 + 0.15 * sin(t * 0.4)));
+gpu_set_blendmode(bm_add);
+draw_set_color(make_color_rgb(255, 60, 60));
+draw_set_alpha(0.15 * p);
+draw_rectangle(x0 - 22, y0 - 128 + _dy, x0 + 22, y0 + _dy, false);
+gpu_set_blendmode(bm_normal);
+draw_set_alpha(1);
+draw_set_color(c_white);

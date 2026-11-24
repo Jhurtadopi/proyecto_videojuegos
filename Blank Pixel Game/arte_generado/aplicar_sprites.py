@@ -45,7 +45,10 @@ def cuadros_enemigo(prefijo):
 for _nombre in ["ligero_idle", "ligero_correr", "ligero_ataque", "ligero_aire", "ligero_aturdido", "ligero_derribado",
                 "jefe_idle", "jefe_caminar", "jefe_ataque", "jefe_disparo", "jefe_guardia",
                 "jefe_aturdido", "jefe_aire", "jefe_derribado",
-                "centinela_idle", "centinela_disparo", "centinela_aturdida", "centinela_bala"]:
+                "centinela_idle", "centinela_disparo", "centinela_aturdida", "centinela_bala",
+                "demonio_idle", "demonio_correr", "demonio_tajo", "demonio_lanzador", "demonio_aire",    # jefe Azraek
+                "demonio_picada", "demonio_invocar", "demonio_aturdido", "demonio_esquiva",
+                "diablito_idle", "diablito_correr", "diablito_ataque", "diablito_aire"]:
     if cuadros_enemigo(_nombre):
         SPRITES.append(("spr_enemigo_" + _nombre, cuadros_enemigo(_nombre), 6, ENEM))
 
@@ -55,7 +58,8 @@ def cuadros_nivel(prefijo):
     if not os.path.isdir(NIV): return []
     return sorted([f[:-4] for f in os.listdir(NIV) if f.startswith(prefijo + "_") and f.endswith(".png")],
                   key=lambda n: int(n.split("_")[-1]))
-for _nombre in ["pinchos", "boton", "checkpoint", "plataforma", "puerta", "meta", "tile"]:
+for _nombre in ["pinchos", "boton", "checkpoint", "plataforma", "puerta", "meta", "tile",
+                "corazon", "demonio", "diablito", "llave", "cerradura"]:
     if cuadros_nivel(_nombre):
         SPRITES.append(("spr_nivel_" + _nombre, cuadros_nivel(_nombre), 6, NIV))
 

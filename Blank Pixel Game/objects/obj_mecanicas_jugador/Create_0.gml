@@ -27,6 +27,9 @@ mec_pared_crear();
 mec_underdog_crear();
 mec_shield_crear();
 mec_gunner_crear();
+// Nerf del Gunner (sin editar scr_mec_gunner): 60 % del daño original de cada arma
+for (var i = 0; i < array_length(gn_armas); i++) gn_armas[i].danio = max(1, round(gn_armas[i].danio * 0.6));
+mec_plataformas_crear();
 mec_ud_robot_crear();          // ultimate del Underdog (robot)
 mec_enemigos_anim_crear();     // sprites de los enemigos (scr_mec_animacion_enemigos)
 

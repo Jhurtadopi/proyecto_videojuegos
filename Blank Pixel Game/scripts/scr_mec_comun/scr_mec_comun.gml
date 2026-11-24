@@ -90,3 +90,60 @@ function mec_enemigo_delante(_j, _dir)
 
     return _mejor;
 }
+
+
+// ==============================
+// BARRA DE ULTIMATE GENERAL: una sola para todos los estilos (global.ult_carga, 0..100).
+// Cualquier estilo la carga con el daño que hace; la ultimate de Swordmaster (F) la gasta entera y el
+// robot del Underdog (F) la va gastando mientras está activo. No carga mientras una ultimate está en curso.
+// ==============================
+#macro ULT_MAX 100
+
+function mec_ult_carga()
+{
+    if (!variable_global_exists("ult_carga")) global.ult_carga = 0;
+    return global.ult_carga;
+}
+
+function mec_ult_set(_v)
+{
+    global.ult_carga = clamp(_v, 0, ULT_MAX);
+}
+
+function mec_ult_en_uso()
+{
+    var _u = false;
+    with (obj_mec_golpe) if (variable_instance_exists(id, "sm_ult_fase") && sm_ult_fase != 0) _u = true;
+    with (obj_mecanicas_jugador) if (variable_instance_exists(id, "ub_activo") && ub_activo) _u = true;
+    return _u;
+}
+
+function mec_ult_cargar(_cantidad)
+{
+    if (_cantidad <= 0 || mec_ult_en_uso()) return;
+    mec_ult_set(mec_ult_carga() + _cantidad);
+}
+
+// HUD de la barra en los estilos sin ultimate propia (Shield, Gunner, Base)
+function mec_ult_dibujar_general()
+{
+    var _gw = display_get_gui_width();
+    var _ancho = 180;
+    var _x2 = _gw - 16;
+    var _x1 = _x2 - _ancho;
+    var _y = 78;
+    var _c = mec_ult_carga();
+    var _llena = _c >= ULT_MAX;
+    draw_set_alpha(0.6);
+    draw_set_color(c_black);
+    draw_rectangle(_x1, _y, _x2, _y + 8, false);
+    draw_set_alpha(_llena ? 0.7 + 0.3 * abs(sin(current_time / 120)) : 1);
+    draw_set_color(_llena ? c_white : make_color_rgb(180, 140, 255));
+    draw_rectangle(_x1, _y, _x1 + _ancho * _c / ULT_MAX, _y + 8, false);
+    draw_set_alpha(1);
+    draw_set_halign(fa_right);
+    draw_set_color(_llena ? c_white : c_ltgray);
+    draw_text(_x2, _y + 12, "Ultimate " + string(floor(_c)) + "% (usala en Swordmaster o Underdog)");
+    draw_set_halign(fa_left);
+    draw_set_color(c_white);
+}

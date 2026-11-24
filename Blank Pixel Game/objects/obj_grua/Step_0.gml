@@ -58,10 +58,8 @@ var _dy = _ny - plataforma.y;
 
 if (_dx != 0 || _dy != 0)
 {
-    // El jugador parado encima viaja con la plataforma
-    if (_encima && _dy < 0) mec_mover_con_choque(_j, _dx, _dy);     // subiendo: primero el jugador
+    // (el jugador parado encima viaja con ella gracias a scr_mec_plataformas)
     plataforma.x = _nx;
     plataforma.y = _ny;
-    if (_encima && _dy >= 0) mec_mover_con_choque(_j, _dx, _dy);    // bajando o de lado: después
     carro_x = _nx;
 }

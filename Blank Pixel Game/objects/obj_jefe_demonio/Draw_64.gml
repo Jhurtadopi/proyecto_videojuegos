@@ -1,0 +1,20 @@
+// Barra de vida del jefe
+var _gw = display_get_gui_width();
+var _gh = display_get_gui_height();
+var _w = 520;
+var _x1 = _gw / 2 - _w / 2;
+var _y1 = _gh - 60;
+draw_set_halign(fa_center);
+draw_set_color(c_black);
+draw_text(_gw / 2 + 1, _y1 - 21, nombre_jefe);
+draw_set_color((fase == 2) ? make_color_rgb(255, 80, 80) : make_color_rgb(255, 170, 60));
+draw_text(_gw / 2, _y1 - 22, nombre_jefe + ((fase == 2) ? "  -  FASE 2" : ""));
+draw_set_halign(fa_left);
+draw_set_alpha(0.7);
+draw_set_color(c_black);
+draw_rectangle(_x1 - 3, _y1 - 3, _x1 + _w + 3, _y1 + 13, false);
+draw_set_alpha(1);
+draw_set_color((fase == 2) ? make_color_rgb(220, 30, 40) : make_color_rgb(240, 120, 30));
+draw_rectangle(_x1, _y1, _x1 + _w * max(0, vida) / vida_maxima, _y1 + 10, false);
+draw_set_color(c_white);
+draw_line(_x1 + _w / 2, _y1 - 2, _x1 + _w / 2, _y1 + 12);

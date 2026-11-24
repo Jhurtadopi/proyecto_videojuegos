@@ -19,3 +19,12 @@ if (!colocado)
 
 // Caída al vacío
 if (_j != noone && _j.y > room_height + 96) nivel_reaparecer(15);
+
+// Jefe vencido: portal de salida
+if (meta_al_vencer != noone && colocado && !meta_hecha && instance_number(meta_al_vencer) == 0)
+{
+    meta_hecha = true;
+    var _m = instance_create_layer(room_width / 2, inicio_y, "Instances", obj_meta);
+    _m.siguiente = siguiente;
+    with (obj_camara) aplicar_temblor(8, 30);
+}

@@ -7,6 +7,8 @@
 #   puerta_0             32x128 compuerta de energía
 #   meta_0/1             64x96  portal de salida (2 cuadros de brillo)
 #   tile_0/1/2           32x32  terreno: superficie / relleno / relleno con detalle
+#   llave_0/1            32x16  llave que suelta el minijefe (2 cuadros de brillo)
+#   cerradura_0          32x128 puerta blindada con cerradura (se abre con la llave)
 import os
 from PIL import Image, ImageDraw
 
@@ -134,3 +136,45 @@ guardar(im, "tile_0")
 im = nuevo(32, 32); d = ImageDraw.Draw(im); panel(d, False); guardar(im, "tile_1")
 im = nuevo(32, 32); d = ImageDraw.Draw(im); panel(d, True); guardar(im, "tile_2")
 print("sprites de nivel en", OUT)
+
+
+# --- Llave (la suelta el minijefe): dorada, con gema cian en el ojo ---
+ORO = (250, 196, 40, 255)
+ORO_C = (255, 240, 150, 255)
+ORO_O = (160, 104, 20, 255)
+for i in range(2):
+    im = nuevo(32, 16); d = ImageDraw.Draw(im)
+    d.ellipse([0, 1, 13, 14], fill=ORO, outline=NEGRO)                 # ojo
+    d.ellipse([4, 5, 9, 10], fill=CIAN if i == 0 else (160, 250, 255, 255), outline=NEGRO)   # gema
+    d.arc([1, 2, 12, 13], 200, 290, fill=ORO_C)
+    d.rectangle([12, 6, 30, 9], fill=ORO, outline=NEGRO)               # caña
+    d.line([(13, 7), (29, 7)], fill=ORO_C)
+    d.rectangle([21, 9, 23, 13], fill=ORO, outline=NEGRO)              # dientes
+    d.rectangle([26, 9, 28, 14], fill=ORO, outline=NEGRO)
+    d.line([(14, 8), (29, 8)], fill=ORO_O)
+    if i == 1:
+        d.point([(3, 3), (17, 6), (27, 6)], fill=(255, 255, 255, 255))
+    guardar(im, "llave_%d" % i)
+
+# --- Puerta con cerradura: plancha blindada con bandas doradas y una cerradura grande en el centro ---
+im = nuevo(32, 128); d = ImageDraw.Draw(im)
+d.rectangle([0, 0, 31, 127], fill=ACERO_O, outline=NEGRO)
+for y in range(4, 124, 12):                                            # remaches y paneles
+    d.line([(1, y), (30, y)], fill=(40, 44, 58, 255))
+    d.point([(3, y + 2), (28, y + 2)], fill=ACERO_C)
+d.line([(2, 1), (2, 126)], fill=ACERO)
+d.line([(29, 1), (29, 126)], fill=(36, 40, 52, 255))
+for y in (14, 108):                                                    # bandas doradas
+    d.rectangle([0, y, 31, y + 5], fill=ORO, outline=NEGRO)
+    d.line([(1, y + 1), (30, y + 1)], fill=ORO_C)
+    d.line([(1, y + 4), (30, y + 4)], fill=ORO_O)
+d.rectangle([5, 46, 26, 82], fill=ORO, outline=NEGRO)                  # placa de la cerradura
+d.rectangle([7, 48, 24, 80], fill=ORO_O)
+d.rectangle([8, 49, 23, 79], fill=ORO)
+d.line([(8, 49), (23, 49)], fill=ORO_C)
+d.ellipse([11, 54, 20, 63], fill=NEGRO)                                # ojo de la cerradura
+d.polygon([(13, 61), (18, 61), (20, 74), (11, 74)], fill=NEGRO)
+d.point([(15, 57), (16, 57)], fill=(60, 60, 80, 255))
+d.point([(10, 52), (21, 52), (10, 77), (21, 77)], fill=ORO_C)          # tornillos
+d.rectangle([12, 84, 19, 87], fill=ROJO, outline=NEGRO)                # piloto: cerrada
+guardar(im, "cerradura_0")

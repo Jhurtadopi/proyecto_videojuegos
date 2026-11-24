@@ -2,6 +2,18 @@
 // Rooms del tamaño de la pantalla: cámara fija. Rooms más grandes (niveles): sigue al jugador
 // con desplazamiento lateral suave, mira un poco hacia donde corre y no se sale de la room.
 // El temblor se suma encima en ambos casos.
+// Resolución fija del juego: 1366x768. Los niveles son más grandes que la pantalla; sin esto GameMaker
+// toma el tamaño de la room para la imagen del juego y la ventana, y todo se ve estirado.
+var _rw = 1366, _rh = 768;
+if (surface_get_width(application_surface) != _rw || surface_get_height(application_surface) != _rh)
+    surface_resize(application_surface, _rw, _rh);
+if (!window_get_fullscreen() && (window_get_width() != _rw || window_get_height() != _rh))
+{
+    window_set_size(_rw, _rh);
+    call_later(1, time_source_units_frames, function() { window_center(); });
+}
+display_set_gui_size(_rw, _rh);
+
 vista_w = min(1366, room_width);
 vista_h = min(768, room_height);
 
