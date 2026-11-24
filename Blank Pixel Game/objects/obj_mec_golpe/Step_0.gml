@@ -2,7 +2,8 @@
 if (keyboard_check_pressed(ord("1"))) global.estilo = Estilo.SWORDMASTER;
 if (keyboard_check_pressed(ord("2"))) global.estilo = Estilo.UNDERDOG;
 if (keyboard_check_pressed(ord("3"))) global.estilo = Estilo.SHIELD;
-if (keyboard_check_pressed(ord("4"))) global.estilo = Estilo.BASE;
+if (keyboard_check_pressed(ord("4"))) global.estilo = Estilo.GUNNER;
+if (keyboard_check_pressed(ord("5"))) global.estilo = Estilo.BASE;
 
 // El ultimate congela el mundo con hitstop, así que corre antes de la salida
 mec_swordmaster_ultimate_paso();

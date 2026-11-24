@@ -26,11 +26,12 @@ def cuadros(prefijo):
 # Sprites opcionales: se crean solo si ya existen sus cuadros
 for _nombre in ["gancho", "lanzador", "aereo", "estampada", "corte_arriba",
                 "ud_idle", "ud_correr", "ud_ataque", "ud_excavar", "ud_emerger",
-                "ud_arriba", "ud_subir", "ud_abajo",
+                "ud_arriba", "ud_subir", "ud_abajo",                                  # ud_ = estilo Underdog
                 "ud_robot_idle", "ud_robot_correr", "ud_robot_salto", "ud_robot_puno",     # robot (ultimate Underdog)
                 "ud_robot_upper", "ud_robot_elevar", "ud_robot_martillo",
                 "sh_idle", "sh_correr", "sh_dash", "sh_parry", "sh_lanzar",          # sh_ = estilo Shield
-                "sh_escudo", "sh_sin_idle", "sh_sin_correr"]:   # ud_ = estilo Underdog
+                "sh_escudo", "sh_sin_idle", "sh_sin_correr",
+                "gn_idle", "gn_correr", "gn_disparo", "gn_aire", "gn_deslizar"]:   # gn_ = estilo Gunner
     if cuadros(_nombre):
         SPRITES.append(("spr_jugador_" + _nombre, cuadros(_nombre), 6))
 

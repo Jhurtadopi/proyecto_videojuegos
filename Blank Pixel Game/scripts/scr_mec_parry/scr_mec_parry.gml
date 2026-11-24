@@ -43,6 +43,9 @@ function mec_parry_inicio()
 
     if (parry_timer == 0 && !mec_dash_activo() && !mec_gancho_activo() && mouse_check_button_pressed(mb_left))
     {
+        // El Gunner usa el click para disparar, no para el golpe/parry cuerpo a cuerpo
+        if (global.estilo == Estilo.GUNNER) return;
+
         parry_timer = parry_duracion;
     }
 }

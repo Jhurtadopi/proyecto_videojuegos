@@ -7,6 +7,7 @@ mec_animacion_dibujar();
 mec_underdog_dibujar();
 mec_ud_robot_dibujar();
 mec_shield_dibujar();
+mec_gunner_dibujar();
 
 var _j = jugador;
 
