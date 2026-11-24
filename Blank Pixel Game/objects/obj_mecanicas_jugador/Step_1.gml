@@ -1,3 +1,11 @@
+// Golpes de enemigos cuyo dueño ya no existe (murió con el golpe activo): se desactivan.
+// obj_hitbox (de otro colaborador) renueva su alarma mientras toca una hurtbox y, con el jugador en
+// guardia, lee owner.x sin comprobar que el dueño exista -> crash. Aquí solo se escribe "activo".
+with (obj_hitbox)
+{
+    if (object_index == obj_hitbox && activo && owner != noone && !instance_exists(owner)) activo = false;
+}
+
 // Reiniciar la room (pruebas)
 if (keyboard_check_pressed(ord("R")))
 {
@@ -27,6 +35,7 @@ if (_dir != 0) mirando = _dir;
 x_inicio = jugador.x;
 y_inicio = jugador.y;
 
+mec_ud_robot_inicio();         // antes del Underdog: con el robot activo no excava
 mec_underdog_inicio();
 mec_shield_inicio();         // antes del dash normal: en Shield, Shift es la estampida       // primero: bajo tierra bloquea el dash y el gancho normales
 mec_doble_salto_inicio();

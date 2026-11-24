@@ -210,12 +210,27 @@ function mec_animacion_fin()
 
     // Estilo Underdog: sus propios sprites (taladro y gafas rojas)
     var _ud_idx = -1;
-    if (mec_underdog_activo() && _picado_fase == 0)
+    // Ultimate del Underdog: sprites del robot (si faltan, siguen los del Underdog)
+    var _robot = undefined;
+    if (ub_activo && _picado_fase == 0) _robot = mec_ud_robot_sprite(_spr, _es_golpe, _nombre_golpe, _j.vsp);
+    if (is_array(_robot))
+    {
+        _spr = _robot[0];
+        _vel = _robot[1];
+        _ud_idx = _robot[2];
+    }
+    else if (mec_underdog_activo() && _picado_fase == 0)
     {
         var _vaiven = [0, 1, 2, 1];                 // ida y vuelta: el taladro barre de lado a lado
         if (ud_accion == UdAccion.ARRIBA) { _spr = spr_jugador_ud_arriba; _vel = 0; _ud_idx = _vaiven[(ud_t div 3) mod 4]; }
         else if (ud_accion == UdAccion.SUBIR) { _spr = spr_jugador_ud_subir; _vel = 0; _ud_idx = _vaiven[(ud_t div 3) mod 4]; }
         else if (ud_accion == UdAccion.EMERGER) { _spr = spr_jugador_ud_emerger; _vel = 0; _ud_idx = 0; }
+        else if (ud_accion == UdAccion.ABAJO)
+        {
+            _vel = 0;
+            if (ud_spr_abajo != -1) { _spr = ud_spr_abajo; _ud_idx = (ud_t div 3) mod sprite_get_number(ud_spr_abajo); }
+            else { _spr = spr_jugador_ud_emerger; _ud_idx = 0; }
+        }
         else if (_es_golpe) _spr = spr_jugador_ud_ataque;
         else if (_spr == spr_jugador) _spr = spr_jugador_ud_idle;
         else if (_spr == spr_jugador_correr) _spr = spr_jugador_ud_correr;

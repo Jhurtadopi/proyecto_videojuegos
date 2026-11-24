@@ -19,7 +19,7 @@ else if (global.estilo == Estilo.SHIELD)
 }
 else if (global.estilo == Estilo.UNDERDOG)
 {
-    draw_text(_x, 36, "S: excavar | W + click: taladro arriba | Bajo tierra: Espacio emerger, Shift dash, click pinchazo/arrastre, W + click perforar");
+    draw_text(_x, 36, "S: excavar | W + click: taladro arriba | Bajo tierra: Espacio emerger, Shift dash, click pinchazo/arrastre, W + click perforar | Aire: W + click taladro arriba, S + click taladro abajo | F: robot");
 }
 
 if (golpe_nombre_timer > 0)

@@ -3,6 +3,7 @@
 #        (1 fila: cuadro 1 = idle de referencia para la escala, cuadros 2..N = NOMBRE_0, NOMBRE_1...)
 #        --ataque equivale a --fila ataque. Ej.: --fila gancho para las poses del gancho.
 #        Varias animaciones en la misma fila: --fila lanzador:2,aereo:2,estampada:2
+#      --salida enemigos  deja los PNG en arte_generado/enemigos/ (por defecto: jugador/)
 # Corta una hoja de 2 filas x 6 cuadros (idle x4, salto x2 / correr x4, dash, ataque),
 # la escala a pixel art y deja los PNG en arte_generado/jugador/. Luego: python3 aplicar_sprites.py
 # Acepta hojas con fondo transparente (Higgsfield) o con fondo blanco liso.
@@ -16,8 +17,11 @@ if "--ataque" in args:
 if "--fila" in args:
     i = args.index("--fila"); FILA = args[i + 1]; del args[i:i + 2]
 ATAQUE = FILA is not None
+SALIDA = "jugador"
+if "--salida" in args:
+    i = args.index("--salida"); SALIDA = args[i + 1]; del args[i:i + 2]
 src = args[0]; TARGET_H = int(args[1]) if len(args) > 1 else 63
-OUT = os.path.join(AQUI, "jugador"); os.makedirs(OUT, exist_ok=True)
+OUT = os.path.join(AQUI, SALIDA); os.makedirs(OUT, exist_ok=True)
 
 im = Image.open(src).convert("RGBA")
 a = np.asarray(im).astype(np.int32)

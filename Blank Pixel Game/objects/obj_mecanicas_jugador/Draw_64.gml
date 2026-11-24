@@ -49,3 +49,7 @@ draw_line(_mx + 4, _my, _mx + 10, _my);
 draw_line(_mx, _my - 10, _mx, _my - 4);
 draw_line(_mx, _my + 4, _mx, _my + 10);
 draw_set_color(c_white);
+
+
+// Barra de la ultimate del Underdog (robot)
+mec_ud_robot_dibujar_gui();

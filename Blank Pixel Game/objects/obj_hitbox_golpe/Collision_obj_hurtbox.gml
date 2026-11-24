@@ -34,3 +34,7 @@ with (obj_controladores)
 
 // Carga el ultimate del Swordmaster con el daño hecho
 with (obj_mec_golpe) mec_swordmaster_ultimate_cargar(_damage);
+
+// Carga la barra del robot del Underdog (y con el robot, el martillo hace rebotar al enemigo)
+var _t = _target;
+with (obj_mecanicas_jugador) mec_ud_robot_al_golpear(_t, _damage);
