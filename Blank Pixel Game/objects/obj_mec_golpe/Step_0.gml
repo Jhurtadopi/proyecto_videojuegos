@@ -1,13 +1,8 @@
-if (keyboard_check_pressed(ord("Q")))
-{
-    // Swordmaster -> Underdog -> Base -> Swordmaster
-    switch (global.estilo)
-    {
-        case Estilo.SWORDMASTER: global.estilo = Estilo.UNDERDOG; break;
-        case Estilo.UNDERDOG: global.estilo = Estilo.BASE; break;
-        default: global.estilo = Estilo.SWORDMASTER; break;
-    }
-}
+// Cambiar de estilo con los números (Q queda libre: en Shield lanza el escudo)
+if (keyboard_check_pressed(ord("1"))) global.estilo = Estilo.SWORDMASTER;
+if (keyboard_check_pressed(ord("2"))) global.estilo = Estilo.UNDERDOG;
+if (keyboard_check_pressed(ord("3"))) global.estilo = Estilo.SHIELD;
+if (keyboard_check_pressed(ord("4"))) global.estilo = Estilo.BASE;
 
 // El ultimate congela el mundo con hitstop, así que corre antes de la salida
 mec_swordmaster_ultimate_paso();
@@ -48,6 +43,7 @@ if (!instance_exists(golpe_hitbox))
     var _g = golpe_base;
     if (global.estilo == Estilo.SWORDMASTER) _g = mec_swordmaster_elegir_golpe(_jugador);
     else if (global.estilo == Estilo.UNDERDOG) _g = mec_underdog_elegir_golpe(_jugador);
+    else if (global.estilo == Estilo.SHIELD) _g = mec_shield_elegir_golpe(_jugador);
 
     golpe_hitbox = instance_create_layer(_zona[0], _zona[1], "Instances", obj_hitbox_golpe);
     golpe_hitbox.owner = _jugador;

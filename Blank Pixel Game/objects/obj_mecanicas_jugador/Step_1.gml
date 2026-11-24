@@ -9,6 +9,7 @@ if (keyboard_check_pressed(ord("R")))
 if (keyboard_check_pressed(vk_f1)) { room_goto(Room1); exit; }
 if (keyboard_check_pressed(vk_f2)) { room_goto(Room2); exit; }
 if (keyboard_check_pressed(vk_f3)) { room_goto(Room_Underdog); exit; }
+if (keyboard_check_pressed(vk_f4)) { room_goto(Room_Shield); exit; }
 
 jugador = instance_exists(obj_jugador) ? instance_find(obj_jugador, 0) : noone;
 
@@ -26,7 +27,8 @@ if (_dir != 0) mirando = _dir;
 x_inicio = jugador.x;
 y_inicio = jugador.y;
 
-mec_underdog_inicio();       // primero: bajo tierra bloquea el dash y el gancho normales
+mec_underdog_inicio();
+mec_shield_inicio();         // antes del dash normal: en Shield, Shift es la estampida       // primero: bajo tierra bloquea el dash y el gancho normales
 mec_doble_salto_inicio();
 mec_dash_inicio();
 mec_buffer_inicio();

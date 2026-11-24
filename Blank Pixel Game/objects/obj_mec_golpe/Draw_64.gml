@@ -7,11 +7,15 @@ var _swordmaster = (global.estilo == Estilo.SWORDMASTER);
 
 draw_set_halign(fa_right);
 draw_set_color(c_white);
-draw_text(_x, 16, "Estilo: " + mec_estilo_nombre(global.estilo) + " (Q cambia)");
+draw_text(_x, 16, "Estilo: " + mec_estilo_nombre(global.estilo) + " (1 Swordmaster, 2 Underdog, 3 Shield, 4 Base)");
 
 if (_swordmaster)
 {
-    draw_text(_x, 36, "W + click en suelo: lanzar | Click en aire: corte | S + click en aire: estampar");
+    draw_text(_x, 36, "W + click en suelo: lanzar | Click en aire: corte | W + click en aire: corte ascendente | S + click en aire: estampar");
+}
+else if (global.estilo == Estilo.SHIELD)
+{
+    draw_text(_x, 36, "E: guardia/parry (naranja perfecto, amarillo tardio) | Shift: estampida | Q: lanzar escudo (Q otra vez: volver) | Click: escudazo");
 }
 else if (global.estilo == Estilo.UNDERDOG)
 {

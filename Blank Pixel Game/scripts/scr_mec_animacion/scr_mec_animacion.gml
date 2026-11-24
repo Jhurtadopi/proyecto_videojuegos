@@ -50,6 +50,7 @@ function mec_animacion_crear()
     golpe_spr_lanzador = asset_get_index("spr" + "_jugador_lanzador");
     golpe_spr_aereo = asset_get_index("spr" + "_jugador_aereo");
     golpe_spr_estampada = asset_get_index("spr" + "_jugador_estampada");
+    golpe_spr_corte_arriba = asset_get_index("spr" + "_jugador_corte_arriba");
 
     // ESTELA DEL DASH: siluetas del jugador en cian que se desvanecen
     estela_color = make_color_rgb(0, 230, 255);
@@ -174,6 +175,7 @@ function mec_animacion_fin()
     var _spr_golpe = spr_jugador_ataque;
     if (_nombre_golpe == "Lanzador" && golpe_spr_lanzador != -1) _spr_golpe = golpe_spr_lanzador;
     else if (_nombre_golpe == "Corte aereo" && golpe_spr_aereo != -1) _spr_golpe = golpe_spr_aereo;
+    else if (_nombre_golpe == "Corte ascendente" && golpe_spr_corte_arriba != -1) _spr_golpe = golpe_spr_corte_arriba;
     var _es_golpe = false;
 
     if (_picado_fase > 0)
@@ -224,6 +226,22 @@ function mec_animacion_fin()
             _vel = 0;
             _ud_idx = 0;
         }
+    }
+
+    // Estilo Shield: sprites con el escudo en el brazo (o sin él si está lanzado), si ya existen
+    if (mec_shield_activo() && _picado_fase == 0)
+    {
+        var _sin = !sh_tiene_escudo;
+        var _s_idle = _sin ? sh_spr_sin_idle : sh_spr_idle;
+        var _s_correr = _sin ? sh_spr_sin_correr : sh_spr_correr;
+        if (sh_est_timer > 0 && sh_spr_dash != -1) { _spr = sh_spr_dash; _vel = 0; _ud_idx = (sh_t div 4) mod 2; }
+        else if (sh_guardia && sh_spr_parry != -1) { _spr = sh_spr_parry; _vel = 0; _ud_idx = (sh_guardia_t < 4) ? 0 : 1; }
+        else if (sh_lanzar_anim > 0 && sh_spr_lanzar != -1) { _spr = sh_spr_lanzar; _vel = 0; _ud_idx = (sh_lanzar_anim > 6) ? 0 : 1; }
+        else if (_es_golpe && !_sin && sh_spr_dash != -1) { _spr = sh_spr_dash; _vel = 0; _ud_idx = 0; }   // escudazo
+        else if (_spr == spr_jugador && _s_idle != -1) _spr = _s_idle;
+        else if (_spr == spr_jugador_correr && _s_correr != -1) _spr = _s_correr;
+        else if (_spr == spr_jugador_dash && _s_correr != -1) { _spr = _s_correr; _vel = 0; _ud_idx = 1; }
+        else if (_spr == spr_jugador_salto && _s_idle != -1 && !mec_gancho_activo() && giro_timer <= 0) { _spr = _s_idle; _vel = 0; _ud_idx = 0; }
     }
 
     if (_j.sprite_index != _spr)

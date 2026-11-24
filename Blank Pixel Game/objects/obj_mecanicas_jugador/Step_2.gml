@@ -10,6 +10,7 @@ mec_gancho_fin();
 mec_gancho_enemigo_fin();
 mec_pared_fin();
 mec_underdog_fin();
+mec_shield_fin();
 
 // Estampada del Swordmaster: caída rápida e impacto (vive en obj_mec_golpe)
 var _yi = y_inicio;

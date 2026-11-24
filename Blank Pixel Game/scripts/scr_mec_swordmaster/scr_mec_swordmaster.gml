@@ -68,6 +68,9 @@ function mec_swordmaster_crear()
     // (el jugador camina a 6 en el aire, así que puede seguirlo y continuar el combo)
     sm_aereo = { nombre: "Corte aereo", danio: 6, kx: 1, kx_input: 5, ky: sm_aire_vel, stagger: 25, hitstop: 4, jugador_vsp: sm_aire_vel,
                  zona: [-10, 48, -80, 12] };
+    // W + click en el aire: corte hacia arriba (lanza al enemigo de encima y eleva un poco al jugador)
+    sm_corte_arriba = { nombre: "Corte ascendente", danio: 7, kx: 0, ky: -10, stagger: 30, hitstop: 5, jugador_vsp: -6,
+                        zona: [-24, 30, -130, -20] };
     sm_estampada = { nombre: "Estampada", danio: 12, kx: 0, ky: sm_estampar_vel, stagger: 45, hitstop: 8, jugador_vsp: undefined,
                      zona: [-18, 40, -40, 56] };    // hacia abajo: alcanza enemigos debajo
 
@@ -134,6 +137,8 @@ function mec_swordmaster_elegir_golpe(_j)
         }
         return sm_estampada;
     }
+
+    if (keyboard_check(ord("W"))) return sm_corte_arriba;
 
     return sm_aereo;
 }
