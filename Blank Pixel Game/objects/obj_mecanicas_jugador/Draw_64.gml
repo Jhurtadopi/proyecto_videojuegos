@@ -19,7 +19,9 @@ if (jugador != noone && instance_exists(jugador))
             (gancho_cooldown > 0 ? "cooldown " + string(gancho_cooldown) : "listo")))
         + "\nVoltereta: " + (mec_animacion_girando() ? (giro_con_dash ? "GIRANDO (dash)" : "GIRANDO") :
             (giro_post_gancho ? "lista: Shift para dash con vuelta" : "-"))
-        + "\nUnderdog: " + (mec_underdog_activo() ? (ud_bajo_tierra ? "BAJO TIERRA" : "superficie") : "-"));
+        + "\nUnderdog: " + (mec_underdog_activo() ? (ud_bajo_tierra ? "BAJO TIERRA" : "superficie") : "-")
+        + "\nEscudo: " + (mec_shield_activo() ? ((jugador.bloqueo_recovery_timer > 0) ? "GUARDIA ROTA" :
+            (sh_tiene_escudo ? (sh_guardia ? "guardia " + string(jugador.bloqueo_resistencia - jugador.bloqueo_golpes_recibidos) + "/" + string(jugador.bloqueo_resistencia) : "en mano") : "LANZADO")) : "-"));
 }
 else
 {
@@ -29,7 +31,11 @@ else
 draw_text(16, display_get_gui_height() - 52,
     "A/D mover | Espacio saltar (x2, en pared) | Shift dash (en pleno gancho acelera; tras soltarlo, dash con voltereta) | Click izq. golpe/parry | Abajo agacharse\n"
     + "Mantener click der. para el gancho (A/D impulsan el balanceo, W retrae, S vuelve al punto si estas arriba)\n"
+<<<<<<< HEAD
     + "Click der. sobre un enemigo: atraerlo (mantener: arrastrarlo, soltar: lanzarlo hacia la mira) | W + click der.: ir hacia el | Retroceso reiniciar | F1/F2/F3: Room1 / Room2 / Room_Underdog");
+=======
+    + "Click der. sobre un enemigo: atraerlo (mantener: arrastrarlo, soltar: lanzarlo hacia la mira) | W + click der.: ir hacia el | R reiniciar | F1-F4: Room1 / Room2 / Room_Underdog / Room_Shield");
+>>>>>>> bd2a099f0fe9a40fc91c0ab97a81a6e00d405b96
 
 // Mira del gancho: círculo que sigue al cursor (reemplaza al puntero del sistema)
 var _mx = device_mouse_x_to_gui(0);
@@ -47,3 +53,7 @@ draw_line(_mx + 4, _my, _mx + 10, _my);
 draw_line(_mx, _my - 10, _mx, _my - 4);
 draw_line(_mx, _my + 4, _mx, _my + 10);
 draw_set_color(c_white);
+
+
+// Barra de la ultimate del Underdog (robot)
+mec_ud_robot_dibujar_gui();

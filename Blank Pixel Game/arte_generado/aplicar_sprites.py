@@ -24,12 +24,34 @@ def cuadros(prefijo):
                   key=lambda n: int(n.split("_")[-1]))
 
 # Sprites opcionales: se crean solo si ya existen sus cuadros
-for _nombre in ["gancho", "lanzador", "aereo", "estampada",
+for _nombre in ["gancho", "lanzador", "aereo", "estampada", "corte_arriba",
                 "ud_idle", "ud_correr", "ud_ataque", "ud_excavar", "ud_emerger",
+<<<<<<< HEAD
                 "ud_arriba", "ud_subir",   # ud_ = estilo Underdog
                 "gn_idle", "gn_correr", "gn_disparo", "gn_aire", "gn_deslizar"]:   # gn_ = estilo Gunner
+=======
+                "ud_arriba", "ud_subir", "ud_abajo",
+                "ud_robot_idle", "ud_robot_correr", "ud_robot_salto", "ud_robot_puno",     # robot (ultimate Underdog)
+                "ud_robot_upper", "ud_robot_elevar", "ud_robot_martillo",
+                "sh_idle", "sh_correr", "sh_dash", "sh_parry", "sh_lanzar",          # sh_ = estilo Shield
+                "sh_escudo", "sh_sin_idle", "sh_sin_correr"]:   # ud_ = estilo Underdog
+>>>>>>> bd2a099f0fe9a40fc91c0ab97a81a6e00d405b96
     if cuadros(_nombre):
         SPRITES.append(("spr_jugador_" + _nombre, cuadros(_nombre), 6))
+
+# ENEMIGOS: arte_generado/enemigos/<nombre>_N.png -> spr_enemigo_<nombre>
+# (los asigna en tiempo de ejecución scr_mec_animacion_enemigos, sin tocar los objetos del equipo)
+ENEM = os.path.join(P, "arte_generado", "enemigos")
+def cuadros_enemigo(prefijo):
+    if not os.path.isdir(ENEM): return []
+    return sorted([f[:-4] for f in os.listdir(ENEM) if f.startswith(prefijo + "_") and f.endswith(".png")],
+                  key=lambda n: int(n.split("_")[-1]))
+for _nombre in ["ligero_idle", "ligero_correr", "ligero_ataque", "ligero_aire", "ligero_aturdido", "ligero_derribado",
+                "jefe_idle", "jefe_caminar", "jefe_ataque", "jefe_disparo", "jefe_guardia",
+                "jefe_aturdido", "jefe_aire", "jefe_derribado",
+                "centinela_idle", "centinela_disparo", "centinela_aturdida", "centinela_bala"]:
+    if cuadros_enemigo(_nombre):
+        SPRITES.append(("spr_enemigo_" + _nombre, cuadros_enemigo(_nombre), 6, ENEM))
 
 from PIL import Image
 
@@ -68,7 +90,9 @@ def yy(name, frames, layer, fps, W, H, kids):
                      ks="".join(key_entry(name, f, i, k) for i, (f, k) in enumerate(zip(frames, kids))))
 
 proj = open(YYP).read()
-for name, imgs, fps in SPRITES:
+for _sp in SPRITES:
+    name, imgs, fps = _sp[:3]
+    art = _sp[3] if len(_sp) > 3 else ART
     d = os.path.join(P, "sprites", name)
     old = os.path.join(d, name + ".yy")
     frames, layer = [], None
@@ -85,11 +109,11 @@ for name, imgs, fps in SPRITES:
     frames = (frames + [str(uuid.uuid4()) for _ in imgs])[:len(imgs)]
     os.makedirs(d, exist_ok=True)
     for f, img in zip(frames, imgs):
-        src = os.path.join(ART, img + ".png")
+        src = os.path.join(art, img + ".png")
         copiar_si_cambia(src, os.path.join(d, f + ".png"))
         os.makedirs(os.path.join(d, "layers", f), exist_ok=True)
         copiar_si_cambia(src, os.path.join(d, "layers", f, layer + ".png"))
-    W, H = Image.open(os.path.join(ART, imgs[0] + ".png")).size
+    W, H = Image.open(os.path.join(art, imgs[0] + ".png")).size
     nuevo = yy(name, frames, layer, fps, W, H, kids)
     if not os.path.exists(old) or open(old).read() != nuevo:   # solo escribe si algo cambió
         open(old, "w").write(nuevo)

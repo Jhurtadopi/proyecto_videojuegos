@@ -4,5 +4,9 @@ enum Estilo
     BASE,
     SWORDMASTER,
     UNDERDOG,
+<<<<<<< HEAD
     GUNNER
+=======
+    SHIELD
+>>>>>>> bd2a099f0fe9a40fc91c0ab97a81a6e00d405b96
 }

@@ -17,7 +17,8 @@ enum UdAccion
     ARRIBA,         // W + click en la superficie: taladra hacia arriba
     SUBIR,          // W + click bajo tierra: sale subiendo y taladrando
     EMERGER,        // Espacio bajo tierra: sale de golpe
-    ARRASTRE        // click bajo un enemigo estampado: lo entierra y lo expulsa
+    ARRASTRE,       // click bajo un enemigo estampado: lo entierra y lo expulsa
+    ABAJO           // S + click en el aire: cae taladrando y arrastra al enemigo hasta el suelo
 }
 
 function mec_underdog_crear()
@@ -51,6 +52,8 @@ function mec_underdog_crear()
     // Taladro hacia arriba (W + click): golpes repetidos sosteniendo al enemigo sobre la punta
     ud_zona_arriba = [-30, 30, -130, -30];  // [x desde, x hasta, y desde, y hasta] respecto a los pies
     ud_arriba_frames = 30;          // en la superficie
+    ud_arriba_aire_frames = 24;     // W + click en el aire: se queda suspendido taladrando hacia arriba
+    ud_arriba_aire = false;
     ud_subir_frames = 24;           // desde bajo tierra
     ud_subir_vsp = -11;
     ud_tick_cada = 4;               // frames entre golpes
@@ -68,6 +71,16 @@ function mec_underdog_crear()
     ud_arrastre_stagger = 50;
     ud_arrastre_rango_x = 48;
     ud_arrastre_objetivo = noone;
+
+    // Taladro hacia abajo en el aire (S + click): cae taladrando y sujeta al enemigo bajo la punta
+    ud_abajo_vsp = 9;               // velocidad de caída
+    ud_abajo_frames_max = 90;       // tope por si no encuentra suelo
+    ud_zona_abajo = [-26, 26, -10, 80];     // [x desde, x hasta, y desde, y hasta] respecto a los pies (y+ = abajo)
+    ud_altura_bajo = 50;            // px bajo los pies donde se sostiene al enemigo
+    ud_abajo_final_danio = 10;
+    ud_abajo_final_ky = 12;         // lo estampa: queda derribado (y listo para el arrastre)
+    ud_abajo_final_stagger = 45;
+    ud_spr_abajo = asset_get_index("spr" + "_jugador_ud_abajo");   // opcional
 
     ud_particulas = [];             // tierra: [{x, y, vx, vy, t}]
     ud_color_tierra = make_color_rgb(110, 78, 52);
@@ -177,12 +190,71 @@ function mec_underdog_golpe_arriba(_final, _danio, _ky, _stagger)
 
     if (array_length(_objetivos) > 0)
     {
+        mec_ud_robot_cargar(_danio * array_length(_objetivos));
         var _hs = _final ? 6 : 2;
         var _tf = _final ? 6 : 2;
         var _tt = _final ? 14 : 4;
         with (obj_controladores) aplicar_hitstop(_hs);
         with (obj_camara) aplicar_temblor(_tf, _tt);
         mec_underdog_particulas(_jx, _jy - 90, _final ? 6 : 2, 0.8);
+    }
+}
+
+// Taladro hacia abajo. No final: daña y arrastra al enemigo bajo la punta mientras cae.
+// Final (al tocar el suelo): lo estampa, con impacto de tierra.
+function mec_underdog_golpe_abajo(_final, _danio, _ky, _stagger)
+{
+    var _j = jugador;
+    var _jx = _j.x;
+    var _jy = _j.y;
+    var _z = ud_zona_abajo;
+    var _bajo = ud_altura_bajo;
+    var _kx = mirando * 2;
+    var _lista = ds_list_create();
+    var _n = collision_rectangle_list(_jx + _z[0], _jy + _z[2], _jx + _z[1], _jy + _z[3], obj_enemigo, false, true, _lista, false);
+    var _golpeados = 0;
+
+    for (var i = 0; i < _n; i++)
+    {
+        var _e = _lista[| i];
+        if (!instance_exists(_e) || !_e.visible) continue;
+        _golpeados++;
+        with (_e)
+        {
+            if (_final)
+            {
+                recibir_impacto(_danio, _kx, _ky, _stagger);
+            }
+            else
+            {
+                recibir_impacto(_danio, 0, 0, _stagger);
+                if (instance_exists(id) && lanzable)
+                {
+                    // Lo centra bajo el taladro y lo baja junto con el jugador
+                    x = lerp(x, _jx, 0.4);
+                    hsp = 0;
+                    vsp = clamp(((_jy + _bajo) - y) * 0.35 + 9, -8, 14) - gravedad_enemigo;
+                    estado = EnemyState.AIRBORNE;
+                }
+            }
+        }
+    }
+    ds_list_destroy(_lista);
+
+    if (_golpeados > 0) mec_ud_robot_cargar(_danio * _golpeados);
+
+    if (_final)
+    {
+        mec_underdog_particulas(_jx, _jy, 14, 1.3);
+        instance_create_layer(_jx, _jy, "Instances", obj_fx_estampada, { fuerza: 0.4, radio: 56 });
+        with (obj_camara) aplicar_temblor(5, 12);
+        if (_golpeados > 0) with (obj_controladores) aplicar_hitstop(6);
+    }
+    else if (_golpeados > 0)
+    {
+        with (obj_controladores) aplicar_hitstop(2);
+        with (obj_camara) aplicar_temblor(2, 4);
+        mec_underdog_particulas(_jx, _jy + 40, 2, 0.8);
     }
 }
 
@@ -218,6 +290,8 @@ function mec_underdog_inicio()
         if (ud_accion != UdAccion.ARRASTRE) ud_accion = UdAccion.NINGUNA;
         return;
     }
+
+    if (ub_activo) return;          // en el robot no excava ni taladra (scr_mec_ud_robot)
 
     var _click = mouse_check_button_pressed(mb_left);
     var _w = keyboard_check(ord("W"));
@@ -274,10 +348,18 @@ function mec_underdog_inicio()
     var _suelo = mec_en_suelo(_j);
     var _libre = !mec_parry_golpeando() && !mec_dash_activo() && !mec_gancho_activo() && !mec_gancho_enemigo_activo();
 
-    if (_click && _w && _suelo)
+    if (_click && _w)
     {
+        // En el suelo taladra quieto; en el aire se queda suspendido mientras taladra
         ud_accion = UdAccion.ARRIBA;
-        ud_timer = ud_arriba_frames;
+        ud_arriba_aire = !_suelo;
+        ud_timer = _suelo ? ud_arriba_frames : ud_arriba_aire_frames;
+        ud_tick = 0;
+    }
+    else if (_click && keyboard_check(ord("S")) && !_suelo)
+    {
+        ud_accion = UdAccion.ABAJO;
+        ud_timer = ud_abajo_frames_max;
         ud_tick = 0;
     }
     else if (keyboard_check_pressed(ord("S")) && _suelo && _libre)
@@ -319,6 +401,7 @@ function mec_underdog_fin()
 
         case UdAccion.ARRIBA:
             _j.x = x_inicio;                        // quieto mientras taladra
+            if (ud_arriba_aire) { _j.y = y_inicio; _j.vsp = 0; }   // en el aire: suspendido
             ud_tick++;
             ud_timer--;
             if (ud_timer <= 0)
@@ -343,6 +426,25 @@ function mec_underdog_fin()
             else if (ud_tick mod ud_tick_cada == 0)
             {
                 mec_underdog_golpe_arriba(false, ud_tick_danio, 0, ud_tick_stagger);
+            }
+        break;
+
+        case UdAccion.ABAJO:
+            _j.x = x_inicio;                        // cae recto
+            _j.vsp = ud_abajo_vsp;
+            dash_cooldown = max(dash_cooldown, 2);
+            gancho_cooldown = max(gancho_cooldown, 2);
+            ud_tick++;
+            ud_timer--;
+            if (ud_t mod 2 == 0) mec_underdog_particulas(_j.x, _j.y + 30, 1, 0.7);
+            if (mec_en_suelo(_j) || ud_timer <= 0)
+            {
+                mec_underdog_golpe_abajo(true, ud_abajo_final_danio, ud_abajo_final_ky, ud_abajo_final_stagger);
+                ud_accion = UdAccion.NINGUNA;
+            }
+            else if (ud_tick mod ud_tick_cada == 0)
+            {
+                mec_underdog_golpe_abajo(false, ud_tick_danio, 0, ud_tick_stagger);
             }
         break;
 
@@ -374,6 +476,7 @@ function mec_underdog_fin()
                 var _ky = ud_arrastre_ky;
                 var _st = ud_arrastre_stagger;
                 with (_e) recibir_impacto(_d, 0, _ky, _st);
+                mec_ud_robot_cargar(_d);
                 if (instance_exists(_e))
                 {
                     mec_underdog_particulas(_e.x, _e.y, 16, 1.5);
@@ -477,6 +580,10 @@ function mec_underdog_dibujar()
 // Golpe del click según dónde esté el jugador (lo usa obj_mec_golpe). Contexto: obj_mec_golpe.
 function mec_underdog_elegir_golpe(_j)
 {
+    var _robot = false;
+    with (obj_mecanicas_jugador) _robot = ub_activo;
+    if (_robot) return mec_ud_robot_elegir_golpe(_j);
+
     var _bajo = false;
     with (obj_mecanicas_jugador) _bajo = ud_bajo_tierra || ud_accion == UdAccion.SUBIR;
     var _w = keyboard_check(ord("W"));
@@ -486,7 +593,9 @@ function mec_underdog_elegir_golpe(_j)
         if (_w) return { nombre: "Perforacion", danio: 4, kx: 0, ky: -6, stagger: 30, hitstop: 4, jugador_vsp: undefined, zona: [-30, 30, -130, -30] };
         return { nombre: "Pinchazo", danio: 6, kx: 0, ky: -7, stagger: 25, hitstop: 4, jugador_vsp: undefined, zona: [-30, 30, -90, 0] };
     }
-    if (_w && mec_en_suelo(_j)) return { nombre: "Taladro arriba", danio: 3, kx: 0, ky: 0, stagger: 25, hitstop: 3, jugador_vsp: undefined, zona: [-30, 30, -130, -30] };
+    if (keyboard_check(ord("S")) && !mec_en_suelo(_j))
+        return { nombre: "Taladro abajo", danio: 3, kx: 0, ky: 2, stagger: 25, hitstop: 3, jugador_vsp: undefined, zona: [-26, 26, -10, 70] };
+    if (_w) return { nombre: "Taladro arriba", danio: 3, kx: 0, ky: 0, stagger: 25, hitstop: 3, jugador_vsp: undefined, zona: [-30, 30, -130, -30] };
     return { nombre: "Taladrazo", danio: 9, kx: 6, ky: -1, stagger: 25, hitstop: 5, jugador_vsp: undefined, zona: [-6, 56, -50, -10] };
 }
 
@@ -496,7 +605,11 @@ function mec_estilo_nombre(_e)
     {
         case Estilo.SWORDMASTER: return "Swordmaster";
         case Estilo.UNDERDOG: return "Underdog";
+<<<<<<< HEAD
         case Estilo.GUNNER: return "Gunner";
+=======
+        case Estilo.SHIELD: return "Shield";
+>>>>>>> bd2a099f0fe9a40fc91c0ab97a81a6e00d405b96
         default: return "Base";
     }
 }

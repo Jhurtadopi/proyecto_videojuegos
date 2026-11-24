@@ -5,7 +5,12 @@ if (jugador == noone || !instance_exists(jugador)) exit;
 mec_animacion_dibujar_estela();
 mec_animacion_dibujar();
 mec_underdog_dibujar();
+<<<<<<< HEAD
 mec_gunner_dibujar();
+=======
+mec_ud_robot_dibujar();
+mec_shield_dibujar();
+>>>>>>> bd2a099f0fe9a40fc91c0ab97a81a6e00d405b96
 
 var _j = jugador;
 

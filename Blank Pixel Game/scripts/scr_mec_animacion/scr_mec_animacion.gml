@@ -50,6 +50,7 @@ function mec_animacion_crear()
     golpe_spr_lanzador = asset_get_index("spr" + "_jugador_lanzador");
     golpe_spr_aereo = asset_get_index("spr" + "_jugador_aereo");
     golpe_spr_estampada = asset_get_index("spr" + "_jugador_estampada");
+    golpe_spr_corte_arriba = asset_get_index("spr" + "_jugador_corte_arriba");
 
     // Sprites opcionales del estilo Gunner (si no existen, se usan los normales)
     gn_spr_idle = asset_get_index("spr" + "_jugador_gn_idle");
@@ -181,6 +182,7 @@ function mec_animacion_fin()
     var _spr_golpe = spr_jugador_ataque;
     if (_nombre_golpe == "Lanzador" && golpe_spr_lanzador != -1) _spr_golpe = golpe_spr_lanzador;
     else if (_nombre_golpe == "Corte aereo" && golpe_spr_aereo != -1) _spr_golpe = golpe_spr_aereo;
+    else if (_nombre_golpe == "Corte ascendente" && golpe_spr_corte_arriba != -1) _spr_golpe = golpe_spr_corte_arriba;
     var _es_golpe = false;
 
     if (_picado_fase > 0)
@@ -215,12 +217,27 @@ function mec_animacion_fin()
 
     // Estilo Underdog: sus propios sprites (taladro y gafas rojas)
     var _ud_idx = -1;
-    if (mec_underdog_activo() && _picado_fase == 0)
+    // Ultimate del Underdog: sprites del robot (si faltan, siguen los del Underdog)
+    var _robot = undefined;
+    if (ub_activo && _picado_fase == 0) _robot = mec_ud_robot_sprite(_spr, _es_golpe, _nombre_golpe, _j.vsp);
+    if (is_array(_robot))
+    {
+        _spr = _robot[0];
+        _vel = _robot[1];
+        _ud_idx = _robot[2];
+    }
+    else if (mec_underdog_activo() && _picado_fase == 0)
     {
         var _vaiven = [0, 1, 2, 1];                 // ida y vuelta: el taladro barre de lado a lado
         if (ud_accion == UdAccion.ARRIBA) { _spr = spr_jugador_ud_arriba; _vel = 0; _ud_idx = _vaiven[(ud_t div 3) mod 4]; }
         else if (ud_accion == UdAccion.SUBIR) { _spr = spr_jugador_ud_subir; _vel = 0; _ud_idx = _vaiven[(ud_t div 3) mod 4]; }
         else if (ud_accion == UdAccion.EMERGER) { _spr = spr_jugador_ud_emerger; _vel = 0; _ud_idx = 0; }
+        else if (ud_accion == UdAccion.ABAJO)
+        {
+            _vel = 0;
+            if (ud_spr_abajo != -1) { _spr = ud_spr_abajo; _ud_idx = (ud_t div 3) mod sprite_get_number(ud_spr_abajo); }
+            else { _spr = spr_jugador_ud_emerger; _ud_idx = 0; }
+        }
         else if (_es_golpe) _spr = spr_jugador_ud_ataque;
         else if (_spr == spr_jugador) _spr = spr_jugador_ud_idle;
         else if (_spr == spr_jugador_correr) _spr = spr_jugador_ud_correr;
@@ -233,6 +250,7 @@ function mec_animacion_fin()
         }
     }
 
+<<<<<<< HEAD
     // Estilo Gunner: pistolero con capa y escudo. Sus propios sprites si existen.
     var _gn_idx = -1;
     if (mec_gunner_activo() && _picado_fase == 0 && gn_spr_idle != -1)
@@ -282,6 +300,22 @@ function mec_animacion_fin()
         {
             _spr = gn_spr_idle;
         }
+=======
+    // Estilo Shield: sprites con el escudo en el brazo (o sin él si está lanzado), si ya existen
+    if (mec_shield_activo() && _picado_fase == 0)
+    {
+        var _sin = !sh_tiene_escudo;
+        var _s_idle = _sin ? sh_spr_sin_idle : sh_spr_idle;
+        var _s_correr = _sin ? sh_spr_sin_correr : sh_spr_correr;
+        if (sh_est_timer > 0 && sh_spr_dash != -1) { _spr = sh_spr_dash; _vel = 0; _ud_idx = (sh_t div 4) mod 2; }
+        else if (sh_guardia && sh_spr_parry != -1) { _spr = sh_spr_parry; _vel = 0; _ud_idx = (sh_guardia_t < 4) ? 0 : 1; }
+        else if (sh_lanzar_anim > 0 && sh_spr_lanzar != -1) { _spr = sh_spr_lanzar; _vel = 0; _ud_idx = (sh_lanzar_anim > 6) ? 0 : 1; }
+        else if (_es_golpe && !_sin && sh_spr_dash != -1) { _spr = sh_spr_dash; _vel = 0; _ud_idx = 0; }   // escudazo
+        else if (_spr == spr_jugador && _s_idle != -1) _spr = _s_idle;
+        else if (_spr == spr_jugador_correr && _s_correr != -1) _spr = _s_correr;
+        else if (_spr == spr_jugador_dash && _s_correr != -1) { _spr = _s_correr; _vel = 0; _ud_idx = 1; }
+        else if (_spr == spr_jugador_salto && _s_idle != -1 && !mec_gancho_activo() && giro_timer <= 0) { _spr = _s_idle; _vel = 0; _ud_idx = 0; }
+>>>>>>> bd2a099f0fe9a40fc91c0ab97a81a6e00d405b96
     }
 
     if (_j.sprite_index != _spr)

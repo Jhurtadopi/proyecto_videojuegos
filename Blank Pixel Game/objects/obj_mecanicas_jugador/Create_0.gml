@@ -25,7 +25,13 @@ mec_buffer_crear();
 mec_gancho_enemigo_crear();
 mec_pared_crear();
 mec_underdog_crear();
+<<<<<<< HEAD
 mec_gunner_crear();
+=======
+mec_shield_crear();
+mec_ud_robot_crear();
+mec_enemigos_anim_crear();     // sprites de los enemigos (scr_mec_animacion_enemigos)          // ultimate del Underdog (robot)
+>>>>>>> bd2a099f0fe9a40fc91c0ab97a81a6e00d405b96
 
 // Cámara con temblor (objeto propio): se crea si la room no tiene uno
 if (!instance_exists(obj_camara)) instance_create_layer(0, 0, "Instances", obj_camara);
