@@ -1,5 +1,5 @@
-// Reiniciar la room (pruebas)
-if (keyboard_check_pressed(ord("R")))
+// Reiniciar la room (pruebas). R queda libre para recargar el arma del Gunner.
+if (keyboard_check_pressed(vk_backspace))
 {
     room_restart();
     exit;
@@ -27,6 +27,7 @@ x_inicio = jugador.x;
 y_inicio = jugador.y;
 
 mec_underdog_inicio();       // primero: bajo tierra bloquea el dash y el gancho normales
+mec_gunner_inicio();         // dispara al cursor y cambia de arma (en estilo Gunner)
 mec_doble_salto_inicio();
 mec_dash_inicio();
 mec_buffer_inicio();

@@ -13,6 +13,15 @@ var _equipo_target = object_is_ancestor(_target.object_index, obj_enemigo) || _t
 
 if (_equipo_target == equipo) exit;
 
+// Super bala del Gunner (franco): atraviesa enemigos, cada uno recibe un solo impacto.
+var _atraviesa = variable_instance_exists(id, "gn_atraviesa") && gn_atraviesa;
+if (_atraviesa)
+{
+    if (!variable_instance_exists(id, "gn_golpeados")) gn_golpeados = [];
+    if (array_contains(gn_golpeados, _target)) exit;
+    array_push(gn_golpeados, _target);
+}
+
 var _damage = damage;
 var _kx = knockback_x;
 var _ky = knockback_y;
@@ -28,4 +37,4 @@ with (obj_controladores)
     aplicar_hitstop(5);
 }
 
-instance_destroy();
+if (!_atraviesa) instance_destroy();

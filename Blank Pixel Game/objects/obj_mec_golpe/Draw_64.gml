@@ -17,6 +17,52 @@ else if (global.estilo == Estilo.UNDERDOG)
 {
     draw_text(_x, 36, "S: excavar | W + click: taladro arriba | Bajo tierra: Espacio emerger, Shift dash, click pinchazo/arrastre, W + click perforar");
 }
+else if (global.estilo == Estilo.GUNNER)
+{
+    draw_text(_x, 36, "Click: disparar (apunta con el mouse) | E: cambiar arma | R: recargar");
+
+    // Munición por arma con su icono, arriba a la derecha
+    var _arma_i = 0;
+    var _recargando = false;
+    var _armas = [];
+    var _mun = [];
+
+    with (obj_mecanicas_jugador)
+    {
+        if (variable_instance_exists(id, "gn_armas"))
+        {
+            _arma_i = gn_arma;
+            _recargando = mec_gunner_recargando();
+            for (var k = 0; k < array_length(gn_armas); k++)
+            {
+                array_push(_armas, gn_armas[k]);
+                array_push(_mun, gn_municion[k]);
+            }
+        }
+    }
+
+    var _fila = 70;
+    for (var k = 0; k < array_length(_armas); k++)
+    {
+        var _a = _armas[k];
+        var _activa = (k == _arma_i);
+        var _iy = _fila + k * 24;
+
+        // Icono del arma (munición)
+        if (_a.hud_spr != -1)
+        {
+            var _iw = sprite_get_width(_a.hud_spr);
+            draw_sprite_ext(_a.hud_spr, 0, _x - 60, _iy, 1, 1, 0,
+                _activa ? c_white : make_color_rgb(120, 120, 120),
+                _activa ? 1 : 0.6);
+        }
+
+        // Nombre y cantidad
+        draw_set_color(_activa ? _a.color : make_color_rgb(140, 140, 140));
+        draw_text(_x, _iy - 8, _a.nombre + ":  " + string(_mun[k]) + " / " + string(_a.cargador)
+            + ((_activa && _recargando) ? "  (recargando)" : ""));
+    }
+}
 
 if (golpe_nombre_timer > 0)
 {

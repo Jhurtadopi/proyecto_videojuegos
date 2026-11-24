@@ -26,7 +26,8 @@ def cuadros(prefijo):
 # Sprites opcionales: se crean solo si ya existen sus cuadros
 for _nombre in ["gancho", "lanzador", "aereo", "estampada",
                 "ud_idle", "ud_correr", "ud_ataque", "ud_excavar", "ud_emerger",
-                "ud_arriba", "ud_subir"]:   # ud_ = estilo Underdog
+                "ud_arriba", "ud_subir",   # ud_ = estilo Underdog
+                "gn_idle", "gn_correr", "gn_disparo", "gn_aire", "gn_deslizar"]:   # gn_ = estilo Gunner
     if cuadros(_nombre):
         SPRITES.append(("spr_jugador_" + _nombre, cuadros(_nombre), 6))
 

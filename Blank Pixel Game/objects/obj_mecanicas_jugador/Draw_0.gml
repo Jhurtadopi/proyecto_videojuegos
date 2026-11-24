@@ -5,6 +5,7 @@ if (jugador == noone || !instance_exists(jugador)) exit;
 mec_animacion_dibujar_estela();
 mec_animacion_dibujar();
 mec_underdog_dibujar();
+mec_gunner_dibujar();
 
 var _j = jugador;
 

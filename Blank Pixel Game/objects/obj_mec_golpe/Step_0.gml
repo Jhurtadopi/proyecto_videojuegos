@@ -1,10 +1,11 @@
 if (keyboard_check_pressed(ord("Q")))
 {
-    // Swordmaster -> Underdog -> Base -> Swordmaster
+    // Swordmaster -> Underdog -> Gunner -> Base -> Swordmaster
     switch (global.estilo)
     {
         case Estilo.SWORDMASTER: global.estilo = Estilo.UNDERDOG; break;
-        case Estilo.UNDERDOG: global.estilo = Estilo.BASE; break;
+        case Estilo.UNDERDOG: global.estilo = Estilo.GUNNER; break;
+        case Estilo.GUNNER: global.estilo = Estilo.BASE; break;
         default: global.estilo = Estilo.SWORDMASTER; break;
     }
 }

@@ -51,6 +51,13 @@ function mec_animacion_crear()
     golpe_spr_aereo = asset_get_index("spr" + "_jugador_aereo");
     golpe_spr_estampada = asset_get_index("spr" + "_jugador_estampada");
 
+    // Sprites opcionales del estilo Gunner (si no existen, se usan los normales)
+    gn_spr_idle = asset_get_index("spr" + "_jugador_gn_idle");
+    gn_spr_correr = asset_get_index("spr" + "_jugador_gn_correr");
+    gn_spr_disparo = asset_get_index("spr" + "_jugador_gn_disparo");
+    gn_spr_aire = asset_get_index("spr" + "_jugador_gn_aire");
+    gn_spr_deslizar = asset_get_index("spr" + "_jugador_gn_deslizar");
+
     // ESTELA DEL DASH: siluetas del jugador en cian que se desvanecen
     estela_color = make_color_rgb(0, 230, 255);
     estela_vida = 14;               // frames que tarda en desaparecer cada silueta
@@ -226,6 +233,57 @@ function mec_animacion_fin()
         }
     }
 
+    // Estilo Gunner: pistolero con capa y escudo. Sus propios sprites si existen.
+    var _gn_idx = -1;
+    if (mec_gunner_activo() && _picado_fase == 0 && gn_spr_idle != -1)
+    {
+        var _disparando = (gn_disparo_anim > 0);
+
+        // Reintenta resolver el sprite por si se importó después del Create (quedó en -1)
+        if (gn_spr_deslizar == -1) gn_spr_deslizar = asset_get_index("spr" + "_jugador_gn_deslizar");
+
+        // Suelo tolerante: durante el dash obj_jugador flota ~1px, así que se mira un poco mas abajo
+        var _suelo_dash = _suelo;
+        with (_j) if (place_meeting(x, y + 4, obj_solid)) _suelo_dash = true;
+
+        if (mec_dash_activo() && _suelo_dash && giro_timer <= 0 && gn_spr_deslizar != -1)
+        {
+            // Dash en el suelo: deslizamiento con polvo (el dash aereo mantiene la pose de aire).
+            // Reparte los cuadros del sprite a lo largo del dash para que se vea el ciclo completo.
+            _spr = gn_spr_deslizar;
+            _vel = 0;
+            var _n_desl = sprite_get_number(gn_spr_deslizar);
+            var _avance = (dash_duracion - dash_timer) / max(1, dash_duracion);   // 0 -> 1
+            _gn_idx = min(_n_desl - 1, floor(_avance * _n_desl));
+        }
+        else if (!_suelo || mec_gancho_activo() || giro_timer > 0)
+        {
+            // En el aire / dash: pose aerea (cuadro 1 si va rapido en horizontal)
+            if (gn_spr_aire != -1)
+            {
+                _spr = gn_spr_aire;
+                _vel = 0;
+                // cuadro 0 = dash/vuelo horizontal, cuadro 1 = salto apuntando
+                _gn_idx = (mec_dash_activo() || abs(_j.hsp) > 4) ? 0 : min(1, sprite_get_number(gn_spr_aire) - 1);
+            }
+        }
+        else if (_disparando && gn_spr_disparo != -1)
+        {
+            // Disparando de pie: cuadro 1 (fogonazo) al disparar, 0 (apuntar) despues
+            _spr = gn_spr_disparo;
+            _vel = 0;
+            _gn_idx = (gn_fogonazo > 0) ? min(1, sprite_get_number(gn_spr_disparo) - 1) : 0;
+        }
+        else if (_se_movio && gn_spr_correr != -1)
+        {
+            _spr = gn_spr_correr;
+        }
+        else
+        {
+            _spr = gn_spr_idle;
+        }
+    }
+
     if (_j.sprite_index != _spr)
     {
         _j.sprite_index = _spr;
@@ -246,6 +304,7 @@ function mec_animacion_fin()
     // Salto: cuadro 0 subiendo, cuadro 1 cayendo (durante la vuelta, siempre el 0: más compacto)
     if (_spr == spr_jugador_salto) _j.image_index = (giro_timer > 0 || _j.vsp < 0) ? 0 : 1;
     if (_ud_idx >= 0) _j.image_index = _ud_idx;
+    if (_gn_idx >= 0) _j.image_index = _gn_idx;
 
     // Gancho: se dibuja la pose del brazo levantado (cuadro 0 mano delantera, 1 trasera)
     dibujo_spr = -1;
@@ -267,7 +326,10 @@ function mec_animacion_fin()
         if (estela[i].vida <= 0) array_delete(estela, i, 1);
     }
 
-    if (mec_dash_activo() || _picado_fase == 2)
+    // La estela cian es del dash; el deslizamiento del gunner ya trae su propio polvo
+    var _deslizando_gn = mec_gunner_activo() && gn_spr_deslizar != -1 && _j.sprite_index == gn_spr_deslizar;
+
+    if ((mec_dash_activo() && !_deslizando_gn) || _picado_fase == 2)
     {
         if (estela_contador mod estela_cada == 0)
         {

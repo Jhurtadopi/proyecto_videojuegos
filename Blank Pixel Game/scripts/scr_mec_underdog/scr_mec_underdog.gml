@@ -496,6 +496,7 @@ function mec_estilo_nombre(_e)
     {
         case Estilo.SWORDMASTER: return "Swordmaster";
         case Estilo.UNDERDOG: return "Underdog";
+        case Estilo.GUNNER: return "Gunner";
         default: return "Base";
     }
 }
