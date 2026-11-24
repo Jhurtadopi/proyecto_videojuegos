@@ -1,0 +1,10 @@
+draw_self();
+gpu_set_blendmode(bm_add);
+draw_set_color(make_color_rgb(0, 230, 255));
+draw_set_alpha(0.15 + 0.1 * sin(t * 0.1) + (terminado ? 0.3 : 0));
+draw_ellipse(x - 26, y - 88, x + 26, y - 6, false);
+gpu_set_blendmode(bm_normal);
+draw_set_alpha(1);
+var _j = nivel_jugador();
+if (!terminado && _j != noone && point_distance(x, y, _j.x, _j.y) < 260) nivel_texto(x, y - 104, "SALIDA", make_color_rgb(0, 230, 255), 0.9);
+draw_set_color(c_white);

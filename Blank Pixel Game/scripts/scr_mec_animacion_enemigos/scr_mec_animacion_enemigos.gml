@@ -71,6 +71,16 @@ function mec_enemigos_animacion()
     var _C = ea_centinela;
     var _hb = ea_jefe_hurtbox;
 
+    // Vista de la cámara (en niveles grandes las centinelas fuera de pantalla no disparan)
+    var _vx1 = 0, _vy1 = 0, _vx2 = room_width, _vy2 = room_height;
+    if (view_camera[0] != -1)
+    {
+        _vx1 = camera_get_view_x(view_camera[0]) - 48;
+        _vy1 = camera_get_view_y(view_camera[0]) - 48;
+        _vx2 = _vx1 + camera_get_view_width(view_camera[0]) + 96;
+        _vy2 = _vy1 + camera_get_view_height(view_camera[0]) + 96;
+    }
+
     with (obj_enemigo)
     {
         var _set = undefined;
@@ -129,6 +139,8 @@ function mec_enemigos_animacion()
         {
             // Centinela: mira hacia el jugador (su código la deja siempre mirando a la izquierda)
             if (_jug != noone && instance_exists(_jug)) mirando = (_jug.x >= x) ? 1 : -1;
+            // Fuera de pantalla no dispara (se retiene su contador)
+            if (x < _vx1 || x > _vx2 || y < _vy1 || y > _vy2) disparo_timer = max(disparo_timer, 30);
 
             if (_aturdido && _set.aturdida != -1) _spr = _set.aturdida;
             else if (ea_disparo_t > 0 && _set.disparo != -1) { _spr = _set.disparo; _img = (ea_disparo_t > 10) ? 1 : 2; }

@@ -18,6 +18,9 @@ if (keyboard_check_pressed(vk_f1)) { room_goto(Room1); exit; }
 if (keyboard_check_pressed(vk_f2)) { room_goto(Room2); exit; }
 if (keyboard_check_pressed(vk_f3)) { room_goto(Room_Underdog); exit; }
 if (keyboard_check_pressed(vk_f4)) { room_goto(Room_Shield); exit; }
+// Niveles (F5 / F6): empiezan desde el principio (sin checkpoint)
+if (keyboard_check_pressed(vk_f5)) { global.nivel_cp = undefined; room_goto(Nivel_1); exit; }
+if (keyboard_check_pressed(vk_f6)) { global.nivel_cp = undefined; room_goto(Nivel_2); exit; }
 
 jugador = instance_exists(obj_jugador) ? instance_find(obj_jugador, 0) : noone;
 

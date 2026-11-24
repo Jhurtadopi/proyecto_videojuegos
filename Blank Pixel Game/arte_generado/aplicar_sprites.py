@@ -48,6 +48,16 @@ for _nombre in ["ligero_idle", "ligero_correr", "ligero_ataque", "ligero_aire", 
     if cuadros_enemigo(_nombre):
         SPRITES.append(("spr_enemigo_" + _nombre, cuadros_enemigo(_nombre), 6, ENEM))
 
+# ELEMENTOS DE NIVEL: arte_generado/nivel/<nombre>_N.png -> spr_nivel_<nombre> (generar_sprites_nivel.py)
+NIV = os.path.join(P, "arte_generado", "nivel")
+def cuadros_nivel(prefijo):
+    if not os.path.isdir(NIV): return []
+    return sorted([f[:-4] for f in os.listdir(NIV) if f.startswith(prefijo + "_") and f.endswith(".png")],
+                  key=lambda n: int(n.split("_")[-1]))
+for _nombre in ["pinchos", "boton", "checkpoint", "plataforma", "puerta", "meta", "tile"]:
+    if cuadros_nivel(_nombre):
+        SPRITES.append(("spr_nivel_" + _nombre, cuadros_nivel(_nombre), 6, NIV))
+
 from PIL import Image
 
 def copiar_si_cambia(src, dst):
