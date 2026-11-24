@@ -15,7 +15,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2026.0.0.16",
+    "IDEVersion":"2026.1.0.27",
   },
   "name":"Blank Pixel Game",
   "resources":[
@@ -33,6 +33,7 @@
     {"id":{"name":"obj_jugador","path":"objects/obj_jugador/obj_jugador.yy",},},
     {"id":{"name":"obj_mec_golpe","path":"objects/obj_mec_golpe/obj_mec_golpe.yy",},},
     {"id":{"name":"obj_mecanicas_jugador","path":"objects/obj_mecanicas_jugador/obj_mecanicas_jugador.yy",},},
+    {"id":{"name":"obj_plataforma_desplazable","path":"objects/obj_plataforma_desplazable/obj_plataforma_desplazable.yy",},},
     {"id":{"name":"obj_proyectil","path":"objects/obj_proyectil/obj_proyectil.yy",},},
     {"id":{"name":"obj_solid","path":"objects/obj_solid/obj_solid.yy",},},
     {"id":{"name":"obj_torreta","path":"objects/obj_torreta/obj_torreta.yy",},},
@@ -82,8 +83,8 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
     {"roomId":{"name":"Room3","path":"rooms/Room3/Room3.yy",},},
+    {"roomId":{"name":"Room2","path":"rooms/Room2/Room2.yy",},},
     {"roomId":{"name":"Room_Boss","path":"rooms/Room_Boss/Room_Boss.yy",},},
     {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
     {"roomId":{"name":"Room_Underdog","path":"rooms/Room_Underdog/Room_Underdog.yy",},},
